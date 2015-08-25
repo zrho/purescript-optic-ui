@@ -1,0 +1,33 @@
+{
+  "name": "purescript-ui-optic",
+  "version": "0.1.0",
+  "authors": [
+    "Lukas Heidemann <lukasheidemann@gmail.com>"
+  ],
+  "description": "PureScript UI framework based on optics",
+  "license": "BSD-3-Clause",
+  "homepage": "zrho.de/projects/optic-ui",
+  "ignore": [
+    "**/.*",
+    "bower_components",
+    "node_modules",
+    "output",
+    "bower.json",
+    "package.json"
+  ],
+  "dependencies": {
+    "purescript-lens" : "latest",
+    "purescript-optic" : "latest",
+    "purescript-lists": "latest",
+    "purescript-control": "latest",
+    "purescript-const": "latest",
+    "purescript-functor-compose": "latest",
+    "purescript-identity": "latest",
+    "purescript-unsafe-coerce": "latest",
+    "purescript-exists": "latest",
+    "purescript-dom": "latest",
+    "purescript-console": "latest",
+    "purescript-refs": "latest",
+    "purescript-arrays": "latest"
+  }
+}

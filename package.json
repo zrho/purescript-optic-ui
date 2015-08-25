@@ -1,0 +1,27 @@
+{
+  "name": "purescript-ui-optic",
+  "version": "0.1.0",
+  "description": "PureScript UI framework based on optics",
+  "main": "gulpfile.js",
+  "dependencies": {
+    "virtual-dom": "latest"
+  },
+  "devDependencies": {
+    "bower": "latest",
+    "browserify": "latest",
+    "gulp": "latest",
+    "gulp-purescript": "latest",
+    "purescript": "latest",
+    "vinyl-source-stream": "latest",
+    "rimraf": "latest"
+  },
+  "scripts": {
+    "postinstall": "bower install",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "example-todo":
+      "bower link && cd examples/todo && bower link purescript-ui-optic && gulp"
+  },
+  "author": "Lukas Heidemann",
+  "license": "BSD-3-Clause",
+  "homepage": ""
+}
