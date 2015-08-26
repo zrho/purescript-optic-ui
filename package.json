@@ -1,7 +1,7 @@
 {
   "name": "purescript-ui-optic",
   "version": "0.1.0",
-  "description": "PureScript UI framework based on optics",
+  "description": "PureScript UI framework based on lenses",
   "main": "gulpfile.js",
   "dependencies": {
     "virtual-dom": "latest"
@@ -15,6 +15,10 @@
     "vinyl-source-stream": "latest",
     "rimraf": "latest"
   },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:zrho/purescript-optic-ui.git"
+  },
   "scripts": {
     "postinstall": "bower install",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -23,5 +27,5 @@
   },
   "author": "Lukas Heidemann",
   "license": "BSD-3-Clause",
-  "homepage": ""
+  "homepage": "zrho.me/projects/opticui"
 }

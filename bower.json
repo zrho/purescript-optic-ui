@@ -4,9 +4,9 @@
   "authors": [
     "Lukas Heidemann <lukasheidemann@gmail.com>"
   ],
-  "description": "PureScript UI framework based on optics",
+  "description": "PureScript UI framework based on lenses",
   "license": "BSD-3-Clause",
-  "homepage": "zrho.de/projects/optic-ui",
+  "homepage": "zrho.de/projects/opticui",
   "ignore": [
     "**/.*",
     "bower_components",
