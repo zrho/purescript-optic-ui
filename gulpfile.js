@@ -33,7 +33,14 @@ gulp.task("clean", ["clean-docs", "clean-output"]);
 gulp.task("docs", ["clean-docs"], function() {
   return purescript.pscDocs({
     src: sources,
-    docgen: {
+    docgen: 
+    {
+      "OpticUI.Components": "docs/OpticUI/Components.md",
+      "OpticUI.Core": "docs/OpticUI/Core.md",
+      "OpticUI.HTML.Attributes": "docs/OpticUI/HTML/Attributes.md",
+      "OpticUI.HTML.Elements": "docs/OpticUI/HTML/Elements.md",
+      "OpticUI.HTML.Handlers": "docs/OpticUI/HTML/Handlers.md",
+      "OpticUI.HTML": "docs/OpticUI/HTML.md"
     }
   });
 });
