@@ -6,7 +6,7 @@ var browserify  = require('browserify');
 var source      = require('vinyl-source-stream');
 var rimraf      = require("rimraf");
 
-process.env['NODE_PATH'] = __dirname + '/purescript_modules';
+process.env['NODE_PATH'] = __dirname + '/output';
 
 var sources =
   [ 'src/**/*.purs'

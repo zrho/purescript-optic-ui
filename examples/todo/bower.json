@@ -2,6 +2,6 @@
   "name": "todo",
   "private": true,
   "dependencies": {
-    "purescript-ui-optic": "*"
+    "purescript-optic-ui": "*"
   }
 }
