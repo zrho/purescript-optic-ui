@@ -22,6 +22,16 @@ instance uiMonad :: Monad (UI s eff)
 zoomOne :: forall eff s t a. LensP s t -> UI t eff a -> UI s eff a
 ```
 
+#### `zoomMaybe`
+
+``` purescript
+zoomMaybe :: forall eff s t a. PrismP s t -> UI t eff a -> UI s eff (Maybe a)
+```
+
+Zoom in on a component using a prism. The zoomed UI
+component will be present if the prism matches the constructor for the current state
+and will have access to the state under the constructor.
+
 #### `zoomAll`
 
 ``` purescript
