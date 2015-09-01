@@ -16,18 +16,10 @@
     "package.json"
   ],
   "dependencies": {
-    "purescript-lens" : "latest",
-    "purescript-optic" : "latest",
-    "purescript-lists": "latest",
-    "purescript-control": "latest",
-    "purescript-const": "latest",
-    "purescript-functor-compose": "latest",
-    "purescript-identity": "latest",
-    "purescript-unsafe-coerce": "latest",
-    "purescript-exists": "latest",
-    "purescript-dom": "latest",
-    "purescript-console": "latest",
-    "purescript-refs": "latest",
-    "purescript-arrays": "latest"
+    "purescript-optics": "purescript-optic#~0.8.0",
+    "purescript-dom": "~0.2.6",
+    "purescript-functor-compose": "~0.0.0",
+    "purescript-exists": "~0.2.0",
+    "purescript-refs": "~0.2.0"
   }
 }
