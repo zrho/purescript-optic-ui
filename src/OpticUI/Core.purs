@@ -1,5 +1,11 @@
 module OpticUI.Core
-  (UI (..), zoomOne, zoomAll, zoomIxed, handler, uiState)
+  ( UI (..)
+  , zoomOne
+  , zoomMaybe
+  , zoomAll
+  , zoomIxed
+  , handler
+  , uiState)
   where
 --------------------------------------------------------------------------------
 import           Prelude
@@ -10,6 +16,7 @@ import           Control.Monad.Eff           (Eff ())
 import           Control.Comonad.Store.Class (peek, pos)
 import           Data.Traversable            (traverse)
 import           Data.Tuple                  (Tuple (..))
+import           Data.Maybe                  (Maybe (..))
 import qualified Data.List as L
 --------------------------------------------------------------------------------
 
@@ -40,6 +47,12 @@ instance uiMonad :: Monad (UI s eff)
 -- | have access to the state restricted to the image of the lens.
 zoomOne :: forall eff s t a. LensP s t -> UI t eff a -> UI s eff a
 zoomOne l (UI m) = UI $ \(Tuple s fs) -> m $ Tuple (s ^. l) (fs <<< flip (set l) s)
+  
+-- | Zoom in on a component using a prism. The zoomed UI
+-- | component will be present if the prism matches the constructor for the current state
+-- | and will have access to the state under the constructor.
+zoomMaybe :: forall eff s t a. PrismP s t -> UI t eff a -> UI s eff (Maybe a)
+zoomMaybe pr ui = map _.head <<< L.uncons <$> zoomAll pr ui
 
 -- | Zoom in on a dynamic number of components using a traversal. The zoomed UI
 -- | component will be replicated for each target of the traversal in the
