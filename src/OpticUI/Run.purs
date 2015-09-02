@@ -4,11 +4,13 @@ import           Prelude
 import qualified OpticUI.Internal.VirtualDOM as VD
 import           OpticUI.HTML
 import           OpticUI.Core
+import           Control.Monad         (when)
 import           Control.Monad.Eff     (Eff ())
 import           Control.Monad.Eff.Ref (REF (), newRef, readRef, writeRef)
 import           Data.Function         (Fn2 (), runFn2)
 import           Data.Exists           (runExists)
 import           Data.Maybe            (Maybe (..))
+import           Data.Either           (Either (..))
 import           Data.Nullable         (toNullable, toMaybe)
 import           Data.Tuple            (Tuple (..))
 import           Data.Foldable         (foldMap)
@@ -28,23 +30,32 @@ animate
   :: forall s eff. s
   -> UI s (dom :: DOM, ref :: REF | eff) (HTML (dom :: DOM, ref :: REF | eff))
   -> Eff (dom :: DOM, ref :: REF | eff) Unit
-animate s0 (UI ui) = do
+animate s0 ui = do
   let v0 = VD.vtext ""
   let n0 = VD.createElement v0
   vR <- newRef v0
   nR <- newRef n0
+  gR <- newRef 0
   let
-    step s = do
+    checkGen g go = do
+      h <- readRef gR
+      when (g == h) $ do
+        writeRef gR (h + 1)
+        go
+    step gen s = checkGen gen $ do
       v <- readRef vR
-      h <- ui (Tuple s step)
-      let w = toVTree h
-      _ <- writeRef vR w
-      n <- readRef nR
-      m <- VD.patch (VD.diff v w) n
-      writeRef nR m
+      r <- runUI s (step $ gen + 1) ui
+      case r of
+        Right h -> do
+          let w = toVTree h
+          _ <- writeRef vR w
+          n <- readRef nR
+          m <- VD.patch (VD.diff v w) n
+          writeRef nR m
+        Left go -> go >>= step (gen + 1)
   onLoad $ do
     appendToBody n0
-    step s0
+    step 0 s0
 
 --------------------------------------------------------------------------------
 

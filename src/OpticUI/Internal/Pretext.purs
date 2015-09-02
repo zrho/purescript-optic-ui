@@ -1,11 +1,8 @@
 module OpticUI.Internal.Pretext where
-
-import OpticUI.Internal.Bazaar
-
+--------------------------------------------------------------------------------
+import           OpticUI.Internal.Bazaar
 import           Prelude
-import           Data.List (List (..))
 import qualified Data.List as L
-import           Data.Tuple
 import           Data.Const                  (Const (..), getConst)
 import           Control.Comonad.Store.Class (ComonadStore, peek, pos)
 import           Control.Extend
@@ -14,7 +11,6 @@ import           Data.Functor.Compose        (Compose (..), decompose)
 import           Data.Identity               (Identity (..), runIdentity)
 import           Optic.Core
 import           Optic.Extended
-
 --------------------------------------------------------------------------------
 
 newtype Pretext a b t = Pretext (forall f. (Functor f) => (a -> f b) -> f t)

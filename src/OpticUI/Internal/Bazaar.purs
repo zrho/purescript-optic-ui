@@ -1,14 +1,13 @@
 module OpticUI.Internal.Bazaar where
-
+--------------------------------------------------------------------------------
 import           Prelude
 import           Data.List (List (..))
 import qualified Data.List as L
 import           Data.Tuple
-import           Data.Const (Const (..), getConst)
+import           Data.Const                (Const (..), getConst)
 import           Control.Monad.State       (evalState)
 import           Control.Monad.State.Class (state)
-import           Unsafe.Coerce (unsafeCoerce)
-
+import           Unsafe.Coerce             (unsafeCoerce)
 --------------------------------------------------------------------------------
 
 newtype Bazaar a b t = Bazaar (forall f. (Applicative f) => (a -> f b) -> f t)

@@ -1,5 +1,5 @@
 {
-  "name": "purescript-ui-optic",
+  "name": "purescript-optic-ui",
   "version": "0.1.0",
   "description": "PureScript UI framework based on lenses",
   "main": "gulpfile.js",
@@ -23,7 +23,7 @@
     "postinstall": "bower install",
     "test": "echo \"Error: no test specified\" && exit 1",
     "example-todo":
-      "bower link && cd examples/todo && bower link purescript-ui-optic && gulp"
+      "bower link && cd examples/todo && bower link purescript-optic-ui && gulp"
   },
   "author": "Lukas Heidemann",
   "license": "BSD-3-Clause",
