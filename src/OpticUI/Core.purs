@@ -1,8 +1,8 @@
 module OpticUI.Core
   ( UI ()
   , runUI
+  , zoom
   , zoomOne
-  , zoomAll
   , zoomIxed
   , handler
   , execute
@@ -13,14 +13,12 @@ module OpticUI.Core
 import           Prelude
 import           Optic.Core
 import           Optic.Extended
-import           Control.Alt                 ((<|>))
-import           Control.Plus                (empty)
-import           Control.Alternative         (Alternative)
 import           OpticUI.Internal.Pretext    (holesOf)
 import           OpticUI.Internal.Context    (fromLens)
 import           Control.Monad.Eff           (Eff ())
 import           Control.Comonad.Store.Class (peek, pos)
-import           Data.Foldable               (Foldable, foldr)
+import           Data.Monoid                 (Monoid)
+import           Data.Foldable               (Foldable, foldr, mconcat)
 import           Data.Traversable            (traverse)
 import           Data.Tuple                  (Tuple (..))
 import           Data.Either                 (Either (..), either)
@@ -57,34 +55,34 @@ runUI state handle (UI m) = runExceptT $ m { state: state, handle: handle }
 
 --------------------------------------------------------------------------------
 
+-- | Zoom in on a dynamic number of components using a traversal. The zoomed UI
+-- | component will be replicated for each target of the traversal in the
+-- | encompassing state and will have access to its respective image of the
+-- | traversal.
+zoom
+  :: forall eff s t a. (Monoid a)
+  => TraversalP s t -> UI t eff a -> UI s eff a
+zoom tr m = uiState >>= holesOf tr >>> traverse (flip zoomStore m) >>> map mconcat
+
 -- | Zoom in one a single component using a lens. The zoomed UI component will
 -- | have access to the state restricted to the image of the lens.
 zoomOne :: forall eff s t a. LensP s t -> UI t eff a -> UI s eff a
 zoomOne l m = uiState >>= fromLens l >>> flip zoomStore m
 
--- | Zoom in on a dynamic number of components using a traversal. The zoomed UI
--- | component will be replicated for each target of the traversal in the
--- | encompassing state and will have access to its respective image of the
--- | traversal.
-zoomAll
-  :: forall eff s t a f. (Alternative f)
-  => TraversalP s t -> UI t eff a -> UI s eff (f a)
-zoomAll tr m = uiState >>= holesOf tr >>> traverse (flip zoomStore m) >>> map altConcat
-
 -- | Zoom in on a dynamic number of components using a traversal, like
--- | [`zoomAll`](#zoomAll), keeping track of the index of the zoomed component.
+-- | [`zoom`](#zoom), keeping track of the index of the zoomed component.
 -- |
 -- | Note: The time this function was published, the purescript lens library
 -- | did not yet support indexed traversals. Eventually, if that support is added,
 -- | this function will be altered to take an indexed traversal and pass the
 -- | respective index to the zoomed components.
 zoomIxed
-  :: forall eff s t a f. (Alternative f)
-  => TraversalP s t -> (Int -> UI t eff a) -> UI s eff (f a)
+  :: forall eff s t a. (Monoid a)
+  => TraversalP s t -> (Int -> UI t eff a) -> UI s eff a
 zoomIxed tr m = do
   hs <- holesOf tr <$> uiState
   as <- L.zipWithA (\i p -> zoomStore p (m i)) (L.range 0 $ L.length hs) hs
-  pure (altConcat as)
+  pure (mconcat as)
 
 -- | Access the UI state as seen by this component.
 uiState :: forall eff s. UI s eff s
@@ -123,6 +121,3 @@ inline go = UI $ \st -> const unit <$> lift (go st.state)
 zoomStore :: forall eff w s t a. (ComonadStore t w) => w s -> UI t eff a -> UI s eff a
 zoomStore p (UI m) = UI $ \st -> withExceptT (map $ flip peek p) $ m
   { state: pos p, handle: st.handle <<< flip peek p }
-
-altConcat :: forall f g a. (Foldable f, Alternative g) => f a -> g a
-altConcat = foldr (\x xs -> pure x <|> xs) empty

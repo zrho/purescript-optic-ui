@@ -2,7 +2,7 @@ module OpticUI.Run (animate) where
 --------------------------------------------------------------------------------
 import           Prelude
 import qualified OpticUI.Internal.VirtualDOM as VD
-import           OpticUI.HTML
+import           OpticUI.Markup
 import           OpticUI.Core
 import           Control.Monad         (when)
 import           Control.Monad.Eff     (Eff ())
@@ -12,6 +12,7 @@ import           Data.Exists           (runExists)
 import           Data.Maybe            (Maybe (..))
 import           Data.Either           (Either (..))
 import           Data.Nullable         (toNullable, toMaybe)
+import           Data.Monoid           (Monoid, mempty)
 import           Data.Tuple            (Tuple (..))
 import           Data.Foldable         (foldMap)
 import           DOM                   (DOM ())
@@ -28,7 +29,7 @@ import           DOM.Node.Node         (appendChild)
 
 animate
   :: forall s eff. s
-  -> UI s (dom :: DOM, ref :: REF | eff) (HTML (dom :: DOM, ref :: REF | eff))
+  -> UI s (dom :: DOM, ref :: REF | eff) Markup
   -> Eff (dom :: DOM, ref :: REF | eff) Unit
 animate s0 ui = do
   let v0 = VD.vtext ""
@@ -47,7 +48,7 @@ animate s0 ui = do
       r <- runUI s (step $ gen + 1) ui
       case r of
         Right h -> do
-          let w = toVTree h
+          let w = buildVTree h
           _ <- writeRef vR w
           n <- readRef nR
           m <- VD.patch (VD.diff v w) n
@@ -59,16 +60,20 @@ animate s0 ui = do
 
 --------------------------------------------------------------------------------
 
-toVTree :: forall eff. HTML eff -> VD.VTree
+buildVTree :: Markup -> VD.VTree
+buildVTree (Markup xs) = VD.vnode n "div" n mempty (map toVTree xs) where
+  n = toNullable Nothing
+
+toVTree :: Node -> VD.VTree
 toVTree (Text s) = VD.vtext s
-toVTree (Element ns tag props childs) = VD.vnode
+toVTree (Element ns tag props (Markup childs)) = VD.vnode
   (toNullable ns) tag (toNullable Nothing)
   (foldMap toVProp props) (map toVTree childs)
 
-toVProp :: forall eff. Prop eff -> VD.Props
-toVProp (Attr n v)   = runFn2 VD.attrProp n v
-toVProp (Handler ee) = runExists (\(HandlerE n e) -> runFn2 VD.handlerProp n e) ee
-toVProp (Prop ee)    = runExists (\(PropE n e) -> runFn2 VD.prop n e) ee
+toVProp :: Prop -> VD.Props
+toVProp (Attr n v)     = runFn2 VD.attrProp n v
+toVProp (Handler n ee) = runHandler (\f -> runFn2 VD.handlerProp n f) ee
+toVProp (Prop n ee)    = runExists (\(PropE e) -> runFn2 VD.prop n e) ee
 
 --------------------------------------------------------------------------------
 

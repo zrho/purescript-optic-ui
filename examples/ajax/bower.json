@@ -1,0 +1,12 @@
+{
+  "name": "ajax",
+  "private": true,
+  "dependencies": {
+    "purescript-optic-ui": "*",
+    "purescript-affjax": "latest",
+    "purescript-json": "latest"
+  },
+  "resolutions": {
+    "purescript-transformers": "^0.6.1"
+  }
+}

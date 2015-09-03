@@ -4,20 +4,19 @@ import           Prelude
 import           Optic.Core
 import           Optic.Extended
 import           Data.Maybe              (maybe)
+import           Data.Foldable           (mconcat)
 import           Data.Traversable        (traverse, sequence)
 import qualified Data.List               as L
 import qualified Data.Array              as AR
 import           OpticUI
-import qualified OpticUI.HTML.Elements   as H
-import qualified OpticUI.HTML.Attributes as A
-import qualified OpticUI.HTML.Handlers   as H
+import           OpticUI.Util.Writer
+import qualified OpticUI.Markup.HTML as H
 --------------------------------------------------------------------------------
 
-task del = H.li_ <$> sequence
-  [ zoomOne completed $ checkBox [ A.title "Mark as completed" ]
-  , zoomOne name      $ textField [ A.placeholder "Task description" ]
-  , pure $ H.button [ A.title "Remove task", H.onClick (const del) ] [ H.text "X" ]
-  ]
+task del = collect H.li_ $ do
+  zoomW completed $ checkBox [ H.titleA "Mark as completed" ]
+  zoomW name      $ textField [ H.placeholderA "Task description" ]
+  tell $ H.button [ H.titleA "Remove task", H.onClick (const del) ] (text "X")
 
 todoList = do
   delH <- handler $ \i s -> pure $ s
@@ -27,14 +26,12 @@ todoList = do
     # name  .~ ""
   num <- AR.length <<< _.tasks <$> uiState
   numCompleted <- AR.length <<< AR.filter _.completed <<< _.tasks <$> uiState
-  H.div_ <$> sequence
-    [ pure $ H.h1_ [ H.text "ToDo List "]
-    , H.ul_ <<< L.fromList <$> zoomIxed (tasks <<< traverse) (task <<< delH)
-    , zoomOne name $ textField [ A.placeholder "New Task" ]
-    , pure $ H.button [ H.onClick addH ] [ H.text "Add" ]
-    , pure $ H.p_
-      [ H.text (show numCompleted ++ "/" ++ show num ++ " tasks completed.") ]
-    ]
+  collect H.div_ $ do
+    tell $ H.h1_ $ text "ToDo List"
+    lift (zoomIxed (tasks <<< traverse) (task <<< delH)) >>= H.ul_ >>> tell
+    zoomW name $ textField [ H.placeholderA "New Task" ]
+    tell $ H.button [ H.onClick addH ] $ text "Add"
+    tell $ H.p_ $ text (show numCompleted ++ "/" ++ show num ++ " tasks completed.")
 
 main = animate { name: "", tasks: [] } $ todoList
 
