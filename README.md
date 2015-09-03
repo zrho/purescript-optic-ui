@@ -20,7 +20,9 @@ Examples
 main = animate false $ do
   click <- handler $ \_ s -> pure (not s)
   on    <- uiState
-  pure $ H.button [ A.title "Toggle" ] [ H.text $ if on then "On" else "Off" ]
+  pure $ H.button
+    [ H.titleA "Toggle", H.onClick h ]
+    [ H.text $ if on then "On" else "Off" ]
 ```
 
 ```purescript
