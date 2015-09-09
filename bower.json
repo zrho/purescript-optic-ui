@@ -16,11 +16,12 @@
     "package.json"
   ],
   "dependencies": {
-    "purescript-optic": "latest",
-    "purescript-dom": "latest",
-    "purescript-functor-compose": "latest",
-    "purescript-exists": "latest",
-    "purescript-refs": "latest",
-    "purescript-aff": "latest"
+    "purescript-optics": "purescript-optic#~0.8.0",
+    "purescript-dom": "~0.2.6",
+    "purescript-functor-compose": "~0.0.0",
+    "purescript-exists": "~0.2.0",
+    "purescript-refs": "~0.2.0",
+    "purescript-profunctor": "latest",
+    "purescript-profunctor-lenses": "latest"
   }
 }

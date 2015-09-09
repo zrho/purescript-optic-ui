@@ -1,4 +1,4 @@
-module OpticUI.Run (animate) where
+module OpticUI.Run where
 --------------------------------------------------------------------------------
 import           Prelude
 import qualified OpticUI.Internal.VirtualDOM as VD
@@ -29,7 +29,7 @@ import           DOM.Node.Node         (appendChild)
 
 animate
   :: forall s eff. s
-  -> UI s (dom :: DOM, ref :: REF | eff) Markup
+  -> UI (dom :: DOM, ref :: REF | eff) Markup s s
   -> Eff (dom :: DOM, ref :: REF | eff) Unit
 animate s0 ui = do
   let v0 = VD.vtext ""
@@ -45,15 +45,11 @@ animate s0 ui = do
         go
     step gen s = checkGen gen $ do
       v <- readRef vR
-      r <- runUI s (step $ gen + 1) ui
-      case r of
-        Right h -> do
-          let w = buildVTree h
-          _ <- writeRef vR w
-          n <- readRef nR
-          m <- VD.patch (VD.diff v w) n
-          writeRef nR m
-        Left go -> go >>= step (gen + 1)
+      w <- buildVTree <$> runUI ui s (Handler $ step $ gen + 1)
+      _ <- writeRef vR w
+      n <- readRef nR
+      m <- VD.patch (VD.diff v w) n
+      writeRef nR m
   onLoad $ do
     appendToBody n0
     step 0 s0
@@ -71,9 +67,9 @@ toVTree (Element ns tag props (Markup childs)) = VD.vnode
   (foldMap toVProp props) (map toVTree childs)
 
 toVProp :: Prop -> VD.Props
-toVProp (Attr n v)     = runFn2 VD.attrProp n v
-toVProp (Handler n ee) = runHandler (\f -> runFn2 VD.handlerProp n f) ee
-toVProp (Prop n ee)    = runExists (\(PropE e) -> runFn2 VD.prop n e) ee
+toVProp (AttrP n v)     = runFn2 VD.attrProp n v
+toVProp (HandlerP n ee) = runEventHandler (\f -> runFn2 VD.handlerProp n f) ee
+toVProp (PropP n ee)    = runExists (\(PropE e) -> runFn2 VD.prop n e) ee
 
 --------------------------------------------------------------------------------
 

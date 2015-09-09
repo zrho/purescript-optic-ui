@@ -41,34 +41,34 @@ instance markupMonoid :: Monoid Markup where
 --------------------------------------------------------------------------------
 
 data Prop
-  = Attr    AttrName String
-  | Prop    PropName (Exists PropE)
-  | Handler EventName Handler
+  = AttrP    AttrName String
+  | PropP    PropName (Exists PropE)
+  | HandlerP EventName EventHandler
 
 data PropE e = PropE e
 
 attr :: forall eff. AttrName -> String -> Prop
-attr n v = Attr n v
+attr n v = AttrP n v
 
 prop :: forall eff a. PropName -> a -> Prop
-prop n v = Prop n (mkExists (PropE v))
+prop n v = PropP n (mkExists (PropE v))
 
 handle :: forall e eff. EventName -> (e -> Eff eff Unit) -> Prop
-handle n f = Handler n (mkHandler f)
+handle n f = HandlerP n (mkEventHandler f)
 
 --------------------------------------------------------------------------------
 
 -- | An event handler to be attached to a DOM node. The type of event and the
 -- | row of effects are hidden in an existential package.
-data Handler
+data EventHandler
 
 -- | Build a handler from a handler function.
-mkHandler :: forall e eff. (e -> Eff eff Unit) -> Handler
-mkHandler = unsafeCoerce
+mkEventHandler :: forall e eff. (e -> Eff eff Unit) -> EventHandler
+mkEventHandler = unsafeCoerce
 
 -- | Use the handler function for a handler.
-runHandler :: forall r. (forall e eff. (e -> Eff eff Unit) -> r) -> Handler -> r
-runHandler f h = f (unsafeCoerce h)
+runEventHandler :: forall r. (forall e eff. (e -> Eff eff Unit) -> r) -> EventHandler -> r
+runEventHandler f h = f (unsafeCoerce h)
 
 --------------------------------------------------------------------------------
 
