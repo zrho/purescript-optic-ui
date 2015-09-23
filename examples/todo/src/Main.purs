@@ -17,16 +17,15 @@ task del = withView H.li_ $ mconcat
   ]
 
 todoList = with $ \s h -> let
-  delH i = runHandler h $ s { tasks = maybe [] id $ AR.deleteAt i s.tasks }
-  addH   = runHandler h $ s
-    { tasks = AR.cons { name: s.name, completed: false } s.tasks
-    , name  = ""
-    }
+  deleted i = runHandler h $ s # tasks %~ maybe [] id <<< AR.deleteAt i
+  added     = runHandler h $ s
+    # tasks %~ AR.cons { name: s.name, completed: false }
+    # name  .~ ""
   num = AR.length s.tasks
   numCompleted = AR.length $ AR.filter _.completed s.tasks
   in mconcat
     [ ui $ H.h1_ $ text "ToDo List"
-    , tasks $ foreach (task <<< delH)
+    , tasks $ foreach (task <<< deleted)
     , name  $ textField [ H.placeholderA "New Task" ]
     , ui $ H.button [ H.onClick (const addH) ] $ text "Add"
     , ui $ H.p_ $ text (show numCompleted ++ "/" ++ show num ++ " tasks completed.")
@@ -34,6 +33,6 @@ todoList = with $ \s h -> let
 
 main = animate { tasks: [], name: "" } todoList
 
-completed = lens (_.completed) (\r v -> r { completed = v })
-name      = lens (_.name) (\r v -> r { name = v })
-tasks     = lens (_.tasks) (\r v -> r { tasks = v })
+completed = lens _.completed (_ { completed = _ })
+name      = lens _.name (_ { name = _ })
+tasks     = lens _.tasks (_ { tasks = _ })
