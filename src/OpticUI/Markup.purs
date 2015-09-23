@@ -2,7 +2,7 @@ module OpticUI.Markup where
 --------------------------------------------------------------------------------
 import Prelude
 import Data.Maybe  (Maybe (..))
-import Data.Exists (Exists (..), mkExists, runExists)
+import Data.Exists (Exists (), mkExists, runExists)
 import qualified OpticUI.Internal.VirtualDOM as VD
 import Control.Monad.Eff (Eff())
 import Data.Monoid (Monoid, mempty)

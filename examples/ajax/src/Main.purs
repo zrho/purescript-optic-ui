@@ -1,14 +1,14 @@
 module Main where
 --------------------------------------------------------------------------------
 import           Prelude
-import           Optic.Core
-import           Optic.Extended
+import           Data.Lens
+import           Data.Lens.Internal.Wander
 import           OpticUI
-import           OpticUI.Util.Writer
 import           OpticUI.Components
 import           OpticUI.Components.Async
 import qualified OpticUI.Markup.HTML        as H
 import qualified Data.List                  as L
+import qualified Data.Array                 as A
 import           Data.Monoid                (mempty)
 import           Data.Either                (Either (..))
 import           Data.Maybe                 (Maybe (..), maybe)
@@ -18,45 +18,41 @@ import qualified Data.JSON                  as JS
 import qualified Data.Map                   as M
 import qualified Network.HTTP.Affjax        as AJ
 import           Control.Bind
-import           Control.Monad              (when)
-import           Control.Monad.Writer.Trans (execWriterT)
-import           Control.Monad.Trans        (lift)
-import           Control.Monad.Writer.Class (censor)
 --------------------------------------------------------------------------------
 
-main = animate { name: "", repos: Nothing } $ do
-  h <- handler $ \_ s ->
-    let url = "https://api.github.com/users/" ++ s.name ++ "/repos"
-    in pure $ s # repos .~ Just (request (JS.decode <<< _.response <$> AJ.get url))
-  execWriterT $ do
-    tell $
-      H.h1_ (text "GitHub Repository List") ++
-      H.p_ (text "Enter the name of a GitHub user:")
-    zoomW name $ textField [ H.placeholderA "Enter a user name"]
-    tell $ H.button [ H.onClick h ] $ text "Load"
-    zoomW (repos <<< _Just) $ execWriterT $ do
-      lift async
-      zoomW _Waiting $ pure $ H.p_ $ text "Fetching repositories..."
-      zoomW _Failure $ text <<< show <$> uiState
-      zoomW (_Success <<< _Nothing) $ pure $ H.p_ $ text "Parse error :("
-      zoomW (_Success <<< _Just) repoList
+main = animate { name: "", repos: Nothing } $ with \s h -> let
+  url = "https://api.github.com/users/" ++ s.name ++ "/repos"
+  submitted _ = do
+    r <- async $ JS.decode <<< _.response <$> AJ.get url
+    runHandler h (s # repos ?~ Left r)
+  loaded a  = runHandler h $ s # repos ?~ Right a
+  failure _ = runHandler h $ s # repos ?~ Right Nothing
+  in mconcat
+    [ ui $ H.h1_ $ text "GitHub Repository List"
+    , ui $ H.p_ $ text "Enter the name of a GitHub user:"
+    , name $ textField [ H.placeholderA "Enter a user name" ]
+    , ui $ H.button [ H.onClick submitted ] $ text "Load"
+    , repos <<< _Just $ mconcat
+      [ _Left $ mconcat
+        [ ui $ H.p_ $ text "Fetching repositories..."
+        , onResult loaded failure
+        ]
+      , _Right <<< _Just $ repoList
+      , _Right <<< _Nothing $ ui $ H.p_ $ text "An error occured :("
+      ]
+    ]
 
-repoList = uiState >>= \s -> execWriterT $ do
-  tell $ H.h2_ (text "Repositories")
-  when (L.null (s ^.. _JArray .. traverse)) $ tell $ text "There are no repositories."
-  censor H.ul_
-    $ zoomW (_JArray <<< traverse <<< _JObject <<< ixMap "name" <<< _JString)
-    $ H.li_ <<< text <$> uiState
+repoList = with \s h -> mconcat
+  [ ui $ H.h2_ $ text "Repositories"
+  , withView H.ul_ $ traversal
+    (_JArray <<< traversed <<< _JObject <<< ixMap "name" <<< _JString)
+    $ with \s _ -> ui $ H.li_ $ text s
+  , _JArray <<< filtered A.null $ ui $ H.p_ $ text "There do not seem to be any repos."
+  ]
 
 --------------------------------------------------------------------------------
 -- A huge list of lenses and prisms. Having to define this in user code is
 -- obviously annoying; it might be worthwhile to revive refractor some time.
-
-_Just :: forall a b. Prism (Maybe a) (Maybe b) a b
-_Just = prism Just $ maybe (Left Nothing) Right
-
-_Nothing :: forall a. Prism (Maybe a) (Maybe a) Unit Unit
-_Nothing = prism (const Nothing) $ maybe (Right unit) (Left <<< Just)
 
 _JArray = prism' JS.JArray $ \x -> case x of
   JS.JArray y -> Just y
@@ -74,10 +70,11 @@ _JNumber = prism' JS.JNumber $ \x -> case x of
   JS.JNumber y -> Just y
   _ -> Nothing
 
-name = lens _.name (\r -> r { name = _ })
-repos = lens _.repos (\r -> r { repos = _ })
+name = lens _.name (_ { name = _ })
+repos = lens _.repos (_ { repos = _ })
 
 -- taken from purescript-index, which messes up all my dependencies :(
-ixMap :: forall k v. (Ord k) => k -> TraversalP (M.Map k v) v
-ixMap k v2fv m = M.lookup k m # maybe (pure m) \v ->
-      (\v' -> M.insert k v' m) <$> v2fv v
+ixMap :: forall k v. (Ord k) => k -> Traversal (M.Map k v) (M.Map k v) v v
+ixMap k = wander go where
+  go :: forall f. (Applicative f) => (v -> f v) -> M.Map k v -> f (M.Map k v)
+  go v2fv m = M.lookup k m # maybe (pure m) \v -> (\v' -> M.insert k v' m) <$> v2fv v
