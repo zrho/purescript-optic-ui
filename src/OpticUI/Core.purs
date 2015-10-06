@@ -8,18 +8,19 @@ module OpticUI.Core
   , withView
   , traversal
   , foreach
+  , inline
   ) where
 --------------------------------------------------------------------------------
 import           Prelude
-import           Optic.Core
-import           Optic.Extended
 import           Data.Profunctor            (Profunctor, dimap)
 import           Data.Profunctor.Choice     (Choice, left, right)
 import           Data.Profunctor.Strong     (Strong, first, second)
-import           Control.Monad.State        (evalState)
-import           Control.Monad.State.Class  (state)
+import           Control.Monad.State
+import           Control.Monad.State.Class
 import           Control.Monad.Eff          (Eff ())
 import           Data.Monoid                (Monoid, mempty)
+import           Data.Lens
+import           Data.Profunctor.Star
 import           Data.Traversable           (Traversable, traverse, sequence)
 import           Data.Tuple                 (Tuple (..))
 import           Data.Either                (Either (..), either)
@@ -61,23 +62,35 @@ runHandler (Handler h) = h
 
 --------------------------------------------------------------------------------
 
+-- | Create a static `UI` component from a view.
 ui :: forall eff v s t. v -> UI eff v s t
 ui v = UI \_ _ -> pure v
 
+-- | Access the state and the handler for an `UI` component.
 with :: forall eff v s t. (s -> Handler eff t -> UI eff v s t) -> UI eff v s t
 with f = UI \s h -> case f s h of UI u -> u s h
 
+-- | Manipulate the view of an `UI` component.
 withView :: forall eff v w s t. (v -> w) -> UI eff v s t -> UI eff w s t
 withView f (UI u) = UI \s h -> map f (u s h)
 
-traversal :: forall eff v s t. (Monoid v) => TraversalP s t -> UI eff v t t -> UI eff v s s
-traversal t = fromSink <<< t <<< toSink
+-- | Display a `UI` component for each focus of a `Traversal`.
+traversal
+  :: forall eff v s t. (Monoid v)
+  => Traversal s s t t -> UI eff v t t -> UI eff v s s
+traversal t = fromSink <<< runStar <<< t <<< Star <<< toSink
 
+-- | Display a `UI` component for each element of a `Traversable` container,
+-- | with access to the index into the container.
 foreach
   :: forall eff v s t. (Monoid v, Traversable t)
   => (Int -> UI eff v s s) -> UI eff v (t s) (t s)
 foreach f = fromSink $ sequence <<< indices (toSink <<< f) where
   indices g t = evalState (traverse (\x -> state \i -> Tuple (g i x) (i + 1)) t) 0
+
+-- | Create a `UI` component that executes an action while build.
+inline :: forall eff v s t a. Eff eff v -> UI eff v s t
+inline go = UI \_ _ -> go
 
 --------------------------------------------------------------------------------
 

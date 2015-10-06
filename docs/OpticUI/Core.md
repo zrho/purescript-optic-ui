@@ -3,88 +3,87 @@
 #### `UI`
 
 ``` purescript
-newtype UI s eff a
+newtype UI eff v s t
 ```
 
 ##### Instances
 ``` purescript
-instance uiFunctor :: Functor (UI s eff)
-instance uiApplicative :: Applicative (UI s eff)
-instance uiApply :: Apply (UI s eff)
-instance uiBind :: Bind (UI s eff)
-instance uiMonad :: Monad (UI s eff)
+instance uiProfunctor :: Profunctor (UI eff v)
+instance uiChoice :: (Monoid v) => Choice (UI eff v)
+instance uiStrong :: Strong (UI eff v)
+instance uiSemigroup :: (Semigroup v) => Semigroup (UI eff v s t)
+instance uiMonoid :: (Monoid v) => Monoid (UI eff v s t)
 ```
 
 #### `runUI`
 
 ``` purescript
-runUI :: forall s eff a. s -> (s -> Eff eff Unit) -> UI s eff a -> Eff eff (Either (Eff eff s) a)
+runUI :: forall eff v s t. UI eff v s t -> s -> Handler eff t -> Eff eff v
 ```
 
-#### `zoomOne`
+#### `Handler`
 
 ``` purescript
-zoomOne :: forall eff s t a. LensP s t -> UI t eff a -> UI s eff a
+newtype Handler eff s
+  = Handler (s -> Eff eff Unit)
 ```
 
-#### `zoomAll`
+##### Instances
+``` purescript
+instance handlerContravariant :: Contravariant (Handler eff)
+```
+
+#### `runHandler`
 
 ``` purescript
-zoomAll :: forall eff s t a f. (Alternative f) => TraversalP s t -> UI t eff a -> UI s eff (f a)
+runHandler :: forall eff s. Handler eff s -> s -> Eff eff Unit
 ```
 
-Zoom in on a dynamic number of components using a traversal. The zoomed UI
-component will be replicated for each target of the traversal in the
-encompassing state and will have access to its respective image of the
-traversal.
-
-#### `zoomIxed`
+#### `ui`
 
 ``` purescript
-zoomIxed :: forall eff s t a f. (Alternative f) => TraversalP s t -> (Int -> UI t eff a) -> UI s eff (f a)
+ui :: forall eff v s t. v -> UI eff v s t
 ```
 
-Zoom in on a dynamic number of components using a traversal, like
-[`zoomAll`](#zoomAll), keeping track of the index of the zoomed component.
-
-Note: The time this function was published, the purescript lens library
-did not yet support indexed traversals. Eventually, if that support is added,
-this function will be altered to take an indexed traversal and pass the
-respective index to the zoomed components.
-
-#### `uiState`
+#### `with`
 
 ``` purescript
-uiState :: forall eff s. UI s eff s
+with :: forall eff v s t. (s -> Handler eff t -> UI eff v s t) -> UI eff v s t
 ```
 
-Access the UI state as seen by this component.
+Access the state and the handler for an `UI` component.
 
-#### `handler`
+#### `withView`
 
 ``` purescript
-handler :: forall eff s e. (e -> s -> Eff eff s) -> UI s eff (e -> Eff eff Unit)
+withView :: forall eff v w s t. (v -> w) -> UI eff v s t -> UI eff w s t
 ```
 
-Create a continuation for an event handler function.
+Manipulate the view of an `UI` component.
 
-#### `execute`
+#### `traversal`
 
 ``` purescript
-execute :: forall eff s a. (s -> Eff eff s) -> UI s eff a
+traversal :: forall eff v s t. (Monoid v) => Traversal s s t t -> UI eff v t t -> UI eff v s s
 ```
 
-Execute some effectful computation that can change the state. The execution
-of the current UI generation is aborted and the UI is rerendered from
-scratch.
+Display a `UI` component for each focus of a `Traversal`.
 
-Be careful to change the state in a way such that this function is not
-triggered again, which would result in an infinite loop.
+#### `foreach`
+
+``` purescript
+foreach :: forall eff v s t. (Monoid v, Traversable t) => (Int -> UI eff v s s) -> UI eff v (t s) (t s)
+```
+
+Display a `UI` component for each element of a `Traversable` container,
+with access to the index into the container.
 
 #### `inline`
 
 ``` purescript
-inline :: forall eff s a. (s -> Eff eff a) -> UI s eff Unit
+inline :: forall eff v s t a. Eff eff v -> UI eff v s t
 ```
+
+Create a `UI` component that executes an action while build.
 
 
