@@ -49,6 +49,8 @@ foreign import attrProp :: Fn2 String String Props
 foreign import handlerProp :: forall eff e. Fn2 String (e -> Eff eff Unit) Props
 foreign import concatProps :: Fn2 Props Props Props
 foreign import emptyProps  :: Props
+foreign import initializer :: forall eff. Fn2 String (HTMLElement -> Eff eff Unit) Props
+foreign import finalizer   :: forall eff. Fn2 String (HTMLElement -> Eff eff Unit) Props
 
 instance semigroupProps :: Semigroup Props where
   append = runFn2 concatProps
