@@ -19,6 +19,7 @@ type AttrName  = String
 type PropName  = String
 type EventName = String
 type NS        = String
+type UniqueStr = String
 
 data Markup = Markup (Array Node)
 
@@ -41,9 +42,11 @@ instance markupMonoid :: Monoid Markup where
 --------------------------------------------------------------------------------
 
 data Prop
-  = AttrP    AttrName String
-  | PropP    PropName (Exists PropE)
-  | HandlerP EventName EventHandler
+  = AttrP        AttrName String
+  | PropP        PropName (Exists PropE)
+  | HandlerP     EventName EventHandler
+  | InitializerP UniqueStr Initializer
+  | FinalizerP   UniqueStr Finalizer
 
 data PropE e = PropE e
 
@@ -69,6 +72,27 @@ mkEventHandler = unsafeCoerce
 -- | Use the handler function for a handler.
 runEventHandler :: forall r. (forall e eff. (e -> Eff eff Unit) -> r) -> EventHandler -> r
 runEventHandler f h = f (unsafeCoerce h)
+
+--------------------------------------------------------------------------------
+
+data Initializer
+data Finalizer
+
+mkInitializer :: forall eff. (HTMLElement -> Eff eff Unit) -> Initializer
+mkInitializer = unsafeCoerce
+
+runInitializer :: forall r. ((forall eff. HTMLElement -> Eff eff Unit) -> r) -> Initializer -> r
+runInitializer f init = f (unsafeCoerce init)
+
+initializer s f = InitializerP s (mkInitializer f)
+
+mkFinalizer   :: forall eff. (HTMLElement -> Eff eff Unit) -> Finalizer
+mkFinalizer   = unsafeCoerce
+
+runFinalizer :: forall r. ((forall eff. HTMLElement -> Eff eff Unit) -> r) -> Finalizer -> r
+runFinalizer f i = f (unsafeCoerce i)
+
+finalizer s f = FinalizerP s (mkFinalizer f)
 
 --------------------------------------------------------------------------------
 
