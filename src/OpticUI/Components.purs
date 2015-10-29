@@ -1,6 +1,7 @@
 module OpticUI.Components
-  ( textField, checkBox )
-  where
+  ( checkBox
+  , textField
+  ) where
 --------------------------------------------------------------------------------
 import           Prelude
 import           OpticUI.Core
@@ -10,16 +11,14 @@ import           DOM          (DOM ())
 import           Data.Maybe   (maybe)
 --------------------------------------------------------------------------------
 
-textField :: forall eff. Array Prop -> UI String (dom :: DOM | eff) Markup
-textField attr = do
-  v    <- uiState
-  inpH <- handler $ \w _ -> pure (maybe "" id w)
-  return $ H.input_
-    (attr ++ [ H.valueA v, H.typeA "text", H.onInput (const inpH) ])
+textField :: forall eff. Array Prop -> UI (dom :: DOM | eff) Markup String String
+textField as = with $ \s h -> let
+  inpH _ = runHandler h <<< maybe "" id
+  bs     = [ H.valueA s, H.typeA "text", H.onInput inpH ]
+  in ui $ H.input_ (as ++ bs)
 
-checkBox :: forall eff. Array Prop -> UI Boolean (dom :: DOM | eff) Markup
-checkBox attr = do
-  v    <- uiState
-  inpH <- handler $ \w _ -> pure w
-  return $ H.input_
-    (attr ++ [ H.checkedA v, H.typeA "checkbox", H.onChecked (const inpH) ])
+checkBox :: forall eff. Array Prop -> UI (dom :: DOM | eff) Markup Boolean Boolean
+checkBox as = with $ \s h -> let
+  inpH _ = runHandler h
+  bs     = [ H.checkedA s, H.typeA "checkbox", H.onChecked inpH ]
+  in ui $ H.input_ (as ++ bs)

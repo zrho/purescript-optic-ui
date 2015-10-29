@@ -119,3 +119,28 @@ exports.concatProps = function () {
 
 // Props
 exports.emptyProps = {};
+
+//Fn2 String (HTMLElement -> Eff eff Unit) Props
+exports.initializer = function(s, f){
+  var Hook = function () {};
+  Hook.prototype.hook = function (node) {
+    if(!node.initialized){
+      node.initialized = true;
+      f(node)();
+    }
+  };
+  var obj = {};
+  obj[s] = new Hook(f);
+  return obj;
+};
+
+//Fn2 String (HTMLElement -> Eff eff Unit) Props
+exports.finalizer = function(s, f){
+  var Hook = function () {};
+  Hook.prototype.unhook = function (node) {
+    f(node)();
+  };
+  var obj = {};
+  obj[s] = new Hook(f);
+  return obj;
+};

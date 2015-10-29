@@ -1,13 +1,15 @@
 module OpticUI.Markup.HTML where
 --------------------------------------------------------------------------------
 import Prelude hiding (sub, div, map)
-import OpticUI.Markup (Markup (), Prop (), Event (), element, handle, attr, prop)
+import OpticUI.Markup (Markup (), Prop (), Event (), element, handle, attr, prop, UniqueStr (), 
+                       initializer, finalizer)
 import Data.Maybe         (Maybe (..), maybe)
 import Data.Either        (either)
 import Data.Monoid        (mempty)
 import Data.Foreign       (toForeign)
 import Data.Foreign.Class (IsForeign, readProp)
 import Control.Monad.Eff  (Eff())
+import DOM.HTML.Types     (HTMLElement ())
 --------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------
@@ -423,6 +425,12 @@ onInput h = handle "input" $ \e -> h e (getProp "value" e)
 
 onChecked :: forall eff a. (Event () -> Boolean -> Eff eff Unit) -> Prop
 onChecked h = handle "change" $ \e -> h e (maybe false id $ getProp "checked" e)
+
+onInitialized :: forall eff. UniqueStr -> (HTMLElement -> Eff eff Unit) -> Prop
+onInitialized s = initializer ("opticui-init-" ++ s)
+
+onFinalized :: forall eff. UniqueStr -> (HTMLElement -> Eff eff Unit) -> Prop
+onFinalized s = finalizer ("opticui-fin-" ++ s)
 
 getProp :: forall a r. (IsForeign a) => String -> Event r -> Maybe a
 getProp p = either (const Nothing) Just <<< readProp p <<< toForeign <<< _.target

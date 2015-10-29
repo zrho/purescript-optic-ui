@@ -3,13 +3,13 @@
 #### `textField`
 
 ``` purescript
-textField :: forall eff. Array (Prop (dom :: DOM | eff)) -> UI String (dom :: DOM | eff) (HTML (dom :: DOM | eff))
+textField :: forall eff. Array Prop -> UI (dom :: DOM | eff) Markup String String
 ```
 
 #### `checkBox`
 
 ``` purescript
-checkBox :: forall eff. Array (Prop (dom :: DOM | eff)) -> UI Boolean (dom :: DOM | eff) (HTML (dom :: DOM | eff))
+checkBox :: forall eff. Array Prop -> UI (dom :: DOM | eff) Markup Boolean Boolean
 ```
 
 
