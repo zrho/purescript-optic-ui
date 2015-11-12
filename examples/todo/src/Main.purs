@@ -27,7 +27,7 @@ todoList = with $ \s h -> let
     [ ui $ H.h1_ $ text "ToDo List"
     , tasks $ foreach (task <<< deleted)
     , name  $ textField [ H.placeholderA "New Task" ]
-    , ui $ H.button [ H.onClick (const addH) ] $ text "Add"
+    , ui $ H.button [ H.onClick (const added) ] $ text "Add"
     , ui $ H.p_ $ text (show numCompleted ++ "/" ++ show num ++ " tasks completed.")
     ]
 
