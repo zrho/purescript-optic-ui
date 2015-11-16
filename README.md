@@ -16,30 +16,29 @@ Examples
 
 ```purescript
 main = animate false $ with \on h ->
-  clicked _ = runHandler h (pure $ not on)
-  in ui $ H.button $ mconcat
+  let clicked _ = runHandler h (not on)
+  in mconcat $ ui <$>
     [ H.h1_ $ text "Toggle Button"
-    , H.titleA "Toggle", H.onClick clicked
-    , text $ if on then "On" else "Off"
+    , H.button [H.titleA "Toggle", H.onClick clicked] $ text $ if on then "On" else "Off"
     ]
 ```
 
 ```purescript
 main = animate "Hello World" $ withView H.div_ $ with \s h -> mconcat
-  [ ui $ H.h1 $ text "Synchronized Text Fields"
+  [ ui $ H.h1_ $ text "Synchronized Text Fields"
   , ui $ H.p_ $ text "First text field:"
   , textField []
-  , ui $ H.p_ $ text "Second text field:" ]
+  , ui $ H.p_ $ text "Second text field:"
   , textField []
   ]
 ```
 
 ```purescript
-main = animate (Tuple "Left" "Right") $ withView H.div_ $
+main = animate (Tuple "Left" "Right") $ withView H.div_ $ mconcat
   [ ui $ H.h1_ $ text "Independent Text Fields"
   , ui $ H.p_ $ text "First text field:"
   , _1 $ textField []
-  , ui $ H.p_ $ text "Second text field:" ]
+  , ui $ H.p_ $ text "Second text field:"
   , _2 $ textField []
   ]
 ```
