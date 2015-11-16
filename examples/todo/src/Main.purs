@@ -2,10 +2,9 @@ module Main where
 --------------------------------------------------------------------------------
 import           Prelude
 import           Data.Lens
-import           Data.Maybe              (maybe)
-import           Data.Foldable           (mconcat)
-import qualified Data.List               as L
-import qualified Data.Array              as AR
+import           Data.Maybe          (maybe)
+import           Data.Foldable       (mconcat)
+import qualified Data.Array          as AR
 import           OpticUI
 import qualified OpticUI.Markup.HTML as H
 --------------------------------------------------------------------------------
