@@ -33,7 +33,7 @@ import           DOM.Node.Node         (appendChild)
 --------------------------------------------------------------------------------
 
 type MemoInitFin = {initializers :: StrMap VD.Props, finalizers :: StrMap VD.Props}
-type Driver eff s = s -> Eff eff Unit
+type Driver eff s = (s -> s) -> Eff eff Unit
 
 animate
   :: forall s eff. s
@@ -44,6 +44,7 @@ animate s0 ui = do
   let n0 = VD.createElement v0
   vR <- newRef v0
   nR <- newRef n0
+  sR <- newRef s0
   gR <- newRef 0
   mR <- newRef ({initializers: empty, finalizers: empty} :: MemoInitFin)
   let
@@ -58,12 +59,14 @@ animate s0 ui = do
       (Tuple w newmemo) <- (\tree -> buildVTree tree memo) <$> runUI ui s (Handler $ step $ gen + 1)
       _ <- writeRef mR newmemo
       _ <- writeRef vR w
+      _ <- writeRef sR s
       n <- readRef nR
       m <- VD.patch (VD.diff v w) n
       writeRef nR m
-    driver s = do
+    driver f = do
       h <- readRef gR
-      step h s
+      s <- readRef sR
+      step h (f s)
   onLoad $ do
     appendToBody n0
     step 0 s0
