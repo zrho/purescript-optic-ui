@@ -33,11 +33,12 @@ import           DOM.Node.Node         (appendChild)
 --------------------------------------------------------------------------------
 
 type MemoInitFin = {initializers :: StrMap VD.Props, finalizers :: StrMap VD.Props}
+type Driver eff s = s -> Eff eff Unit
 
 animate
   :: forall s eff. s
   -> UI (dom :: DOM, ref :: REF | eff) Markup s s
-  -> Eff (dom :: DOM, ref :: REF | eff) Unit
+  -> Eff (dom :: DOM, ref :: REF | eff) (Driver (dom :: DOM, ref :: REF | eff) s)
 animate s0 ui = do
   let v0 = VD.vtext ""
   let n0 = VD.createElement v0
@@ -60,9 +61,13 @@ animate s0 ui = do
       n <- readRef nR
       m <- VD.patch (VD.diff v w) n
       writeRef nR m
+    driver s = do
+      h <- readRef gR
+      step h s
   onLoad $ do
     appendToBody n0
     step 0 s0
+  return driver
 
 --------------------------------------------------------------------------------
 
@@ -113,7 +118,7 @@ onLoad go = do
   let et = windowToEventTarget w
   addEventListener load (eventListener (\_ -> go)) false et
 
-appendToBody :: forall m eff. HTMLElement -> Eff (dom :: DOM | eff) Unit
+appendToBody :: forall eff. HTMLElement -> Eff (dom :: DOM | eff) Unit
 appendToBody e = do
   w <- window
   d <- document w
