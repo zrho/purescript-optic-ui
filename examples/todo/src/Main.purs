@@ -2,10 +2,9 @@ module Main where
 --------------------------------------------------------------------------------
 import           Prelude
 import           Data.Lens
-import           Data.Maybe              (maybe)
-import           Data.Foldable           (mconcat)
-import qualified Data.List               as L
-import qualified Data.Array              as AR
+import           Data.Maybe          (maybe)
+import           Data.Foldable       (mconcat)
+import qualified Data.Array          as AR
 import           OpticUI
 import qualified OpticUI.Markup.HTML as H
 --------------------------------------------------------------------------------
@@ -27,7 +26,7 @@ todoList = with $ \s h -> let
     [ ui $ H.h1_ $ text "ToDo List"
     , tasks $ foreach (task <<< deleted)
     , name  $ textField [ H.placeholderA "New Task" ]
-    , ui $ H.button [ H.onClick (const addH) ] $ text "Add"
+    , ui $ H.button [ H.onClick (const added) ] $ text "Add"
     , ui $ H.p_ $ text (show numCompleted ++ "/" ++ show num ++ " tasks completed.")
     ]
 
