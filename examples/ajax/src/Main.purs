@@ -2,6 +2,7 @@ module Main where
 --------------------------------------------------------------------------------
 import           Prelude
 import           Data.Lens
+import           Data.Lens.Index            (ix)
 import           Data.Lens.Internal.Wander
 import           OpticUI
 import           OpticUI.Components
@@ -45,7 +46,7 @@ main = animate { name: "", repos: Nothing } $ with \s h -> let
 repoList = with \s h -> mconcat
   [ ui $ H.h2_ $ text "Repositories"
   , withView H.ul_ $ traversal
-    (_JArray <<< traversed <<< _JObject <<< ixMap "name" <<< _JString)
+    (_JArray <<< traversed <<< _JObject <<< ix "name" <<< _JString)
     $ with \s _ -> ui $ H.li_ $ text s
   , _JArray <<< filtered A.null $ ui $ H.p_ $ text "There do not seem to be any repos."
   ]
@@ -72,9 +73,3 @@ _JNumber = prism' JS.JNumber $ \x -> case x of
 
 name = lens _.name (_ { name = _ })
 repos = lens _.repos (_ { repos = _ })
-
--- taken from purescript-index, which messes up all my dependencies :(
-ixMap :: forall k v. (Ord k) => k -> Traversal (M.Map k v) (M.Map k v) v v
-ixMap k = wander go where
-  go :: forall f. (Applicative f) => (v -> f v) -> M.Map k v -> f (M.Map k v)
-  go v2fv m = M.lookup k m # maybe (pure m) \v -> (\v' -> M.insert k v' m) <$> v2fv v
