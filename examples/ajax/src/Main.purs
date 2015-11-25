@@ -3,22 +3,17 @@ module Main where
 import           Prelude
 import           Data.Lens
 import           Data.Lens.Index            (ix)
-import           Data.Lens.Internal.Wander
 import           OpticUI
 import           OpticUI.Components
 import           OpticUI.Components.Async
 import qualified OpticUI.Markup.HTML        as H
-import qualified Data.List                  as L
 import qualified Data.Array                 as A
-import           Data.Monoid                (mempty)
 import           Data.Either                (Either (..))
-import           Data.Maybe                 (Maybe (..), maybe)
-import           Data.Foldable              (Foldable, mconcat)
+import           Data.Maybe                 (Maybe (..))
+import           Data.Foldable              (mconcat)
 import           Data.Traversable           (traverse)
 import qualified Data.JSON                  as JS
-import qualified Data.Map                   as M
 import qualified Network.HTTP.Affjax        as AJ
-import           Control.Bind
 --------------------------------------------------------------------------------
 
 main = animate { name: "", repos: Nothing } $ with \s h -> let
