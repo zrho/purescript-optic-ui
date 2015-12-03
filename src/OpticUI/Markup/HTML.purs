@@ -1,7 +1,7 @@
 module OpticUI.Markup.HTML where
 --------------------------------------------------------------------------------
 import Prelude hiding (sub, div, map)
-import OpticUI.Markup (Markup (), Prop (), Event (), element, handle, attr, prop, UniqueStr (), 
+import OpticUI.Markup (Markup (), Prop (), Event (), KeyboardEvent (), element, handle, attr, prop, UniqueStr (),
                        initializer, finalizer)
 import Data.Maybe         (Maybe (..), maybe)
 import Data.Either        (either)
@@ -408,6 +408,18 @@ typeA = attr "type"
 placeholderA :: String -> Prop
 placeholderA = attr "placeholder"
 
+srcA :: String -> Prop
+srcA = attr "src"
+
+heightA :: Int -> Prop
+heightA px = attr "height" $ show px
+
+widthA :: Int -> Prop
+widthA px = attr "width" $ show px
+
+styleA :: String -> Prop
+styleA = attr "style"
+
 valueA :: String -> Prop
 valueA = prop "value"
 
@@ -422,6 +434,9 @@ onClick h = handle "click" h
 
 onInput :: forall eff a. (IsForeign a) => (Event () -> Maybe a -> Eff eff Unit) -> Prop
 onInput h = handle "input" $ \e -> h e (getProp "value" e)
+
+onKeydown :: forall eff a. (IsForeign a) => (KeyboardEvent () -> Maybe a -> Eff eff Unit) -> Prop
+onKeydown h = handle "keydown" $ \e -> h e (getProp "value" e)
 
 onChecked :: forall eff a. (Event () -> Boolean -> Eff eff Unit) -> Prop
 onChecked h = handle "change" $ \e -> h e (maybe false id $ getProp "checked" e)

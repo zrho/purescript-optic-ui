@@ -89,7 +89,7 @@ foreach f = fromSink $ sequence <<< indices (toSink <<< f) where
   indices g t = evalState (traverse (\x -> state \i -> Tuple (g i x) (i + 1)) t) 0
 
 -- | Create a `UI` component that executes an action while build.
-inline :: forall eff v s t a. Eff eff v -> UI eff v s t
+inline :: forall eff v s t. Eff eff v -> UI eff v s t
 inline go = UI \_ _ -> go
 
 --------------------------------------------------------------------------------

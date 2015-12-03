@@ -2,22 +2,18 @@ module Main where
 --------------------------------------------------------------------------------
 import           Prelude
 import           Data.Lens
-import           Data.Lens.Internal.Wander
+import           Data.Lens.Index            (ix)
 import           OpticUI
 import           OpticUI.Components
 import           OpticUI.Components.Async
 import qualified OpticUI.Markup.HTML        as H
-import qualified Data.List                  as L
 import qualified Data.Array                 as A
-import           Data.Monoid                (mempty)
 import           Data.Either                (Either (..))
-import           Data.Maybe                 (Maybe (..), maybe)
-import           Data.Foldable              (Foldable, mconcat)
+import           Data.Maybe                 (Maybe (..))
+import           Data.Foldable              (mconcat)
 import           Data.Traversable           (traverse)
 import qualified Data.JSON                  as JS
-import qualified Data.Map                   as M
 import qualified Network.HTTP.Affjax        as AJ
-import           Control.Bind
 --------------------------------------------------------------------------------
 
 main = animate { name: "", repos: Nothing } $ with \s h -> let
@@ -45,7 +41,7 @@ main = animate { name: "", repos: Nothing } $ with \s h -> let
 repoList = with \s h -> mconcat
   [ ui $ H.h2_ $ text "Repositories"
   , withView H.ul_ $ traversal
-    (_JArray <<< traversed <<< _JObject <<< ixMap "name" <<< _JString)
+    (_JArray <<< traversed <<< _JObject <<< ix "name" <<< _JString)
     $ with \s _ -> ui $ H.li_ $ text s
   , _JArray <<< filtered A.null $ ui $ H.p_ $ text "There do not seem to be any repos."
   ]
@@ -72,9 +68,3 @@ _JNumber = prism' JS.JNumber $ \x -> case x of
 
 name = lens _.name (_ { name = _ })
 repos = lens _.repos (_ { repos = _ })
-
--- taken from purescript-index, which messes up all my dependencies :(
-ixMap :: forall k v. (Ord k) => k -> Traversal (M.Map k v) (M.Map k v) v v
-ixMap k = wander go where
-  go :: forall f. (Applicative f) => (v -> f v) -> M.Map k v -> f (M.Map k v)
-  go v2fv m = M.lookup k m # maybe (pure m) \v -> (\v' -> M.insert k v' m) <$> v2fv v
