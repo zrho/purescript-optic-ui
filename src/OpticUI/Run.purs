@@ -18,6 +18,7 @@ import           Data.Nullable         (toNullable, toMaybe)
 import           Data.Monoid           (Monoid, mempty)
 import           Data.Tuple            (Tuple (..))
 import           Data.Traversable      (traverse)
+import           Data.Foldable         (foldl)
 import           Data.Array            (foldM)
 import           Data.StrMap           (StrMap (), empty, lookup, insert)
 import           DOM                   (DOM ())
@@ -85,8 +86,13 @@ toVTree :: Node -> State MemoInitFin VD.VTree
 toVTree (Text s) = return $ VD.vtext s
 toVTree (Element ns tag props (Markup childs)) = do 
   vprops <- foldM (\acc prop -> (append acc) <$> toVProp prop) mempty props
+  let key = foldl findKey Nothing props
   tree <- traverse toVTree childs
-  return $ VD.vnode (toNullable ns) tag (toNullable Nothing) vprops tree
+  return $ VD.vnode (toNullable ns) tag (toNullable key) vprops tree
+
+findKey :: Maybe String -> Prop -> Maybe String
+findKey _ (KeyP key) = Just key
+findKey r _ = r
 
 toVProp :: Prop -> State MemoInitFin VD.Props
 toVProp (AttrP n v)          = pure $ runFn2 VD.attrProp n v
@@ -96,6 +102,7 @@ toVProp (InitializerP key f) = findProp _.initializers (\is -> _ {initializers =
                                  runInitializer (\i -> runFn2 VD.initializer key i) f
 toVProp (FinalizerP key f)   = findProp _.finalizers (\fs -> _ {finalizers = fs}) key $ 
                                  runFinalizer (\i -> runFn2 VD.finalizer key i) f
+toVProp (KeyP key)           = pure mempty  
 
 -- Looks for an initializer/finalizer with the same key. If it exists, it uses that one to avoid
 -- Virtual Dom removing and adding the node. If it doesn't exist, this function adds it to the 
