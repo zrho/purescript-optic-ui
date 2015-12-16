@@ -47,6 +47,7 @@ data Prop
   | HandlerP     EventName EventHandler
   | InitializerP UniqueStr Initializer
   | FinalizerP   UniqueStr Finalizer
+  | KeyP         String
 
 data PropE e = PropE e
 
@@ -58,6 +59,9 @@ prop n v = PropP n (mkExists (PropE v))
 
 handle :: forall e eff. EventName -> (e -> Eff eff Unit) -> Prop
 handle n f = HandlerP n (mkEventHandler f)
+
+key :: String -> Prop
+key = KeyP
 
 --------------------------------------------------------------------------------
 
