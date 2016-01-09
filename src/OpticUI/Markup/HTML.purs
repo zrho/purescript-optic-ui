@@ -426,26 +426,93 @@ valueA = prop "value"
 checkedA :: Boolean -> Prop
 checkedA = prop "checked"
 
+draggableA :: Prop
+draggableA = attr "draggable" "true"
+
 --------------------------------------------------------------------------------
 -- Event Handlers
 
 onClick :: forall eff. (Event () -> Eff eff Unit) -> Prop
 onClick h = handle "click" h
 
+onDblClick :: forall eff. (Event MouseEvent -> Eff eff Unit) -> Prop
+onDblClick h = handle "dblclick" h
+
+onMouseDown :: forall eff. (Event MouseEvent -> Eff eff Unit) -> Prop
+onMouseDown h = handle "mousedown" h
+
+onMouseUp :: forall eff. (Event MouseEvent -> Eff eff Unit) -> Prop
+onMouseUp h = handle "mouseup" h
+
+onMouseMove :: forall eff. (Event MouseEvent -> Eff eff Unit) -> Prop
+onMouseMove h = handle "mousemove" h
+
+onMouseLeave :: forall eff. (Event MouseEvent -> Eff eff Unit) -> Prop
+onMouseLeave h = handle "mouseleave" h
+
+onMouseOver :: forall eff. (Event MouseEvent -> Eff eff Unit) -> Prop
+onMouseOver h = handle "mouseover" h
+
+onWheel :: forall eff. (Event WheelEvent -> Eff eff Unit) -> Prop
+onWheel h = handle "wheel" h
+
 onInput :: forall eff a. (IsForeign a) => (Event () -> Maybe a -> Eff eff Unit) -> Prop
 onInput h = handle "input" $ \e -> h e (getProp "value" e)
+
+onChange :: forall eff. (Event () -> Eff eff Unit) -> Prop
+onChange h = handle "change" h
 
 onKeydown :: forall eff a. (IsForeign a) => (KeyboardEvent () -> Maybe a -> Eff eff Unit) -> Prop
 onKeydown h = handle "keydown" $ \e -> h e (getProp "value" e)
 
-onChecked :: forall eff a. (Event () -> Boolean -> Eff eff Unit) -> Prop
+onChecked :: forall eff. (Event () -> Boolean -> Eff eff Unit) -> Prop
 onChecked h = handle "change" $ \e -> h e (maybe false id $ getProp "checked" e)
 
+onDragStart :: forall eff. (Event DragEvent -> Eff eff Unit) -> Prop
+onDragStart h = handle "dragstart" h
+
+onDragOver :: forall eff. (Event DragEvent -> Eff eff Unit) -> Prop
+onDragOver h = handle "dragover" h
+
+onDrop :: forall eff. (Event DragEvent -> Eff eff Unit) -> Prop
+onDrop h = handle "drop" h
+
 onInitialized :: forall eff. UniqueStr -> (HTMLElement -> Eff eff Unit) -> Prop
-onInitialized s = initializer ("opticui-init-" ++ s)
+onInitialized str = initializer ("opticui-init-" ++ str)
 
 onFinalized :: forall eff. UniqueStr -> (HTMLElement -> Eff eff Unit) -> Prop
-onFinalized s = finalizer ("opticui-fin-" ++ s)
+onFinalized str = finalizer ("opticui-fin-" ++ str)
 
 getProp :: forall a r. (IsForeign a) => String -> Event r -> Maybe a
-getProp p = either (const Nothing) Just <<< readProp p <<< toForeign <<< _.target
+getProp prop = either (const Nothing) Just <<< readProp prop <<< toForeign <<< _.target
+
+-------------------------------------------------------------------------------------
+-- Events
+
+type WheelEvent = (
+    deltaX :: Number, 
+    deltaY :: Number, 
+    deltaZ :: Number,
+    deltaMode :: Int
+)
+
+type MouseEvent = (
+    button :: Number, 
+    detail :: Number, 
+    relatedTarget :: HTMLElement, 
+    clientX :: Number, 
+    clientY :: Number, 
+    screenX :: Number, 
+    screenY :: Number, 
+    pageX :: Number, 
+    pageY :: Number,
+    ctrlKey :: Boolean, 
+    shiftKey :: Boolean, 
+    altKey :: Boolean, 
+    metaKey :: Boolean, 
+    which :: Number
+)
+
+type DragEvent = (dataTransfer :: DataTransfer | MouseEvent)
+
+foreign import data DataTransfer :: *

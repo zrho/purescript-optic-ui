@@ -1,249 +1,251 @@
 module OpticUI.Markup.SVG where
 --------------------------------------------------------------------------------
 import OpticUI.Markup (Markup (), Prop (), element, attr)
-import Data.Maybe (Maybe (Nothing))
-import Data.Monoid (mempty)
+import Data.Maybe (Maybe (Just))
 --------------------------------------------------------------------------------
 
-a :: forall m. Array Prop -> Markup -> Markup
-a = element Nothing "a"
+svgNamespace :: Maybe String
+svgNamespace = Just "http://www.w3.org/2000/svg"
 
-altGlyph :: forall m. Array Prop -> Markup -> Markup
-altGlyph = element Nothing "altGlyph"
+a :: Array Prop -> Markup -> Markup
+a = element svgNamespace "a"
 
-altGlyphDef :: forall m. Array Prop -> Markup -> Markup
-altGlyphDef = element Nothing "altGlyphDef"
+altGlyph :: Array Prop -> Markup -> Markup
+altGlyph = element svgNamespace "altGlyph"
 
-altGlyphItem :: forall m. Array Prop -> Markup -> Markup
-altGlyphItem = element Nothing "altGlyphItem"
+altGlyphDef :: Array Prop -> Markup -> Markup
+altGlyphDef = element svgNamespace "altGlyphDef"
 
-animate :: forall m. Array Prop -> Markup -> Markup
-animate = element Nothing "animate"
+altGlyphItem :: Array Prop -> Markup -> Markup
+altGlyphItem = element svgNamespace "altGlyphItem"
 
-animateColor :: forall m. Array Prop -> Markup -> Markup
-animateColor = element Nothing "animateColor"
+animate :: Array Prop -> Markup -> Markup
+animate = element svgNamespace "animate"
 
-animateMotion :: forall m. Array Prop -> Markup -> Markup
-animateMotion = element Nothing "animateMotion"
+animateColor :: Array Prop -> Markup -> Markup
+animateColor = element svgNamespace "animateColor"
 
-animateTransform :: forall m. Array Prop -> Markup -> Markup
-animateTransform = element Nothing "animateTransform"
+animateMotion :: Array Prop -> Markup -> Markup
+animateMotion = element svgNamespace "animateMotion"
 
-circle :: forall m. Array Prop -> Markup -> Markup
-circle = element Nothing "circle"
+animateTransform :: Array Prop -> Markup -> Markup
+animateTransform = element svgNamespace "animateTransform"
 
-clipPath :: forall m. Array Prop -> Markup -> Markup
-clipPath = element Nothing "clipPath"
+circle :: Array Prop -> Markup -> Markup
+circle = element svgNamespace "circle"
 
-colorProfile :: forall m. Array Prop -> Markup -> Markup
-colorProfile = element Nothing "color-profile"
+clipPath :: Array Prop -> Markup -> Markup
+clipPath = element svgNamespace "clipPath"
 
-cursor :: forall m. Array Prop -> Markup -> Markup
-cursor = element Nothing "cursor"
+colorProfile :: Array Prop -> Markup -> Markup
+colorProfile = element svgNamespace "color-profile"
 
-defs :: forall m. Array Prop -> Markup -> Markup
-defs = element Nothing "defs"
+cursor :: Array Prop -> Markup -> Markup
+cursor = element svgNamespace "cursor"
 
-desc :: forall m. Array Prop -> Markup -> Markup
-desc = element Nothing "desc"
+defs :: Array Prop -> Markup -> Markup
+defs = element svgNamespace "defs"
 
-ellipse :: forall m. Array Prop -> Markup -> Markup
-ellipse = element Nothing "ellipse"
+desc :: Array Prop -> Markup -> Markup
+desc = element svgNamespace "desc"
 
-feBlend :: forall m. Array Prop -> Markup -> Markup
-feBlend = element Nothing "feBlend"
+ellipse :: Array Prop -> Markup -> Markup
+ellipse = element svgNamespace "ellipse"
 
-feColorMatrix :: forall m. Array Prop -> Markup -> Markup
-feColorMatrix = element Nothing "feColorMatrix"
+feBlend :: Array Prop -> Markup -> Markup
+feBlend = element svgNamespace "feBlend"
 
-feComponentTransfer :: forall m. Array Prop -> Markup -> Markup
-feComponentTransfer = element Nothing "feComponentTransfer"
+feColorMatrix :: Array Prop -> Markup -> Markup
+feColorMatrix = element svgNamespace "feColorMatrix"
 
-feComposite :: forall m. Array Prop -> Markup -> Markup
-feComposite = element Nothing "feComposite"
+feComponentTransfer :: Array Prop -> Markup -> Markup
+feComponentTransfer = element svgNamespace "feComponentTransfer"
 
-feConvolveMatrix :: forall m. Array Prop -> Markup -> Markup
-feConvolveMatrix = element Nothing "feConvolveMatrix"
+feComposite :: Array Prop -> Markup -> Markup
+feComposite = element svgNamespace "feComposite"
 
-feDiffuseLighting :: forall m. Array Prop -> Markup -> Markup
-feDiffuseLighting = element Nothing "feDiffuseLighting"
+feConvolveMatrix :: Array Prop -> Markup -> Markup
+feConvolveMatrix = element svgNamespace "feConvolveMatrix"
 
-feDisplacementMap :: forall m. Array Prop -> Markup -> Markup
-feDisplacementMap = element Nothing "feDisplacementMap"
+feDiffuseLighting :: Array Prop -> Markup -> Markup
+feDiffuseLighting = element svgNamespace "feDiffuseLighting"
 
-feDistantLight :: forall m. Array Prop -> Markup -> Markup
-feDistantLight = element Nothing "feDistantLight"
+feDisplacementMap :: Array Prop -> Markup -> Markup
+feDisplacementMap = element svgNamespace "feDisplacementMap"
 
-feFlood :: forall m. Array Prop -> Markup -> Markup
-feFlood = element Nothing "feFlood"
+feDistantLight :: Array Prop -> Markup -> Markup
+feDistantLight = element svgNamespace "feDistantLight"
 
-feFuncA :: forall m. Array Prop -> Markup -> Markup
-feFuncA = element Nothing "feFuncA"
+feFlood :: Array Prop -> Markup -> Markup
+feFlood = element svgNamespace "feFlood"
 
-feFuncB :: forall m. Array Prop -> Markup -> Markup
-feFuncB = element Nothing "feFuncB"
+feFuncA :: Array Prop -> Markup -> Markup
+feFuncA = element svgNamespace "feFuncA"
 
-feFuncG :: forall m. Array Prop -> Markup -> Markup
-feFuncG = element Nothing "feFuncG"
+feFuncB :: Array Prop -> Markup -> Markup
+feFuncB = element svgNamespace "feFuncB"
 
-feFuncR :: forall m. Array Prop -> Markup -> Markup
-feFuncR = element Nothing "feFuncR"
+feFuncG :: Array Prop -> Markup -> Markup
+feFuncG = element svgNamespace "feFuncG"
 
-feGaussianBlur :: forall m. Array Prop -> Markup -> Markup
-feGaussianBlur = element Nothing "feGaussianBlur"
+feFuncR :: Array Prop -> Markup -> Markup
+feFuncR = element svgNamespace "feFuncR"
 
-feImage :: forall m. Array Prop -> Markup -> Markup
-feImage = element Nothing "feImage"
+feGaussianBlur :: Array Prop -> Markup -> Markup
+feGaussianBlur = element svgNamespace "feGaussianBlur"
 
-feMerge :: forall m. Array Prop -> Markup -> Markup
-feMerge = element Nothing "feMerge"
+feImage :: Array Prop -> Markup -> Markup
+feImage = element svgNamespace "feImage"
 
-feMergeNode :: forall m. Array Prop -> Markup -> Markup
-feMergeNode = element Nothing "feMergeNode"
+feMerge :: Array Prop -> Markup -> Markup
+feMerge = element svgNamespace "feMerge"
 
-feMorphology :: forall m. Array Prop -> Markup -> Markup
-feMorphology = element Nothing "feMorphology"
+feMergeNode :: Array Prop -> Markup -> Markup
+feMergeNode = element svgNamespace "feMergeNode"
 
-feOffset :: forall m. Array Prop -> Markup -> Markup
-feOffset = element Nothing "feOffset"
+feMorphology :: Array Prop -> Markup -> Markup
+feMorphology = element svgNamespace "feMorphology"
 
-fePointLight :: forall m. Array Prop -> Markup -> Markup
-fePointLight = element Nothing "fePointLight"
+feOffset :: Array Prop -> Markup -> Markup
+feOffset = element svgNamespace "feOffset"
 
-feSpecularLighting :: forall m. Array Prop -> Markup -> Markup
-feSpecularLighting = element Nothing "feSpecularLighting"
+fePointLight :: Array Prop -> Markup -> Markup
+fePointLight = element svgNamespace "fePointLight"
 
-feSpotLight :: forall m. Array Prop -> Markup -> Markup
-feSpotLight = element Nothing "feSpotLight"
+feSpecularLighting :: Array Prop -> Markup -> Markup
+feSpecularLighting = element svgNamespace "feSpecularLighting"
 
-feTile :: forall m. Array Prop -> Markup -> Markup
-feTile = element Nothing "feTile"
+feSpotLight :: Array Prop -> Markup -> Markup
+feSpotLight = element svgNamespace "feSpotLight"
 
-feTurbulence :: forall m. Array Prop -> Markup -> Markup
-feTurbulence = element Nothing "feTurbulence"
+feTile :: Array Prop -> Markup -> Markup
+feTile = element svgNamespace "feTile"
 
-filter :: forall m. Array Prop -> Markup -> Markup
-filter = element Nothing "filter"
+feTurbulence :: Array Prop -> Markup -> Markup
+feTurbulence = element svgNamespace "feTurbulence"
 
-font :: forall m. Array Prop -> Markup -> Markup
-font = element Nothing "font"
+filter :: Array Prop -> Markup -> Markup
+filter = element svgNamespace "filter"
 
-fontFace :: forall m. Array Prop -> Markup -> Markup
-fontFace = element Nothing "font-face"
+font :: Array Prop -> Markup -> Markup
+font = element svgNamespace "font"
 
-fontFaceFormat :: forall m. Array Prop -> Markup -> Markup
-fontFaceFormat = element Nothing "font-face-format"
+fontFace :: Array Prop -> Markup -> Markup
+fontFace = element svgNamespace "font-face"
 
-fontFaceName :: forall m. Array Prop -> Markup -> Markup
-fontFaceName = element Nothing "font-face-name"
+fontFaceFormat :: Array Prop -> Markup -> Markup
+fontFaceFormat = element svgNamespace "font-face-format"
 
-fontFaceSrc :: forall m. Array Prop -> Markup -> Markup
-fontFaceSrc = element Nothing "font-face-src"
+fontFaceName :: Array Prop -> Markup -> Markup
+fontFaceName = element svgNamespace "font-face-name"
 
-fontFaceUri :: forall m. Array Prop -> Markup -> Markup
-fontFaceUri = element Nothing "font-face-uri"
+fontFaceSrc :: Array Prop -> Markup -> Markup
+fontFaceSrc = element svgNamespace "font-face-src"
 
-foreignObject :: forall m. Array Prop -> Markup -> Markup
-foreignObject = element Nothing "foreignObject"
+fontFaceUri :: Array Prop -> Markup -> Markup
+fontFaceUri = element svgNamespace "font-face-uri"
 
-g :: forall m. Array Prop -> Markup -> Markup
-g = element Nothing "g"
+foreignObject :: Array Prop -> Markup -> Markup
+foreignObject = element svgNamespace "foreignObject"
 
-glyph :: forall m. Array Prop -> Markup -> Markup
-glyph = element Nothing "glyph"
+g :: Array Prop -> Markup -> Markup
+g = element svgNamespace "g"
 
-glyphRef :: forall m. Array Prop -> Markup -> Markup
-glyphRef = element Nothing "glyphRef"
+glyph :: Array Prop -> Markup -> Markup
+glyph = element svgNamespace "glyph"
 
-hkern :: forall m. Array Prop -> Markup -> Markup
-hkern = element Nothing "hkern"
+glyphRef :: Array Prop -> Markup -> Markup
+glyphRef = element svgNamespace "glyphRef"
 
-image :: forall m. Array Prop -> Markup -> Markup
-image = element Nothing "image"
+hkern :: Array Prop -> Markup -> Markup
+hkern = element svgNamespace "hkern"
 
-line :: forall m. Array Prop -> Markup -> Markup
-line = element Nothing "line"
+image :: Array Prop -> Markup -> Markup
+image = element svgNamespace "image"
 
-linearGradient :: forall m. Array Prop -> Markup -> Markup
-linearGradient = element Nothing "linearGradient"
+line :: Array Prop -> Markup -> Markup
+line = element svgNamespace "line"
 
-marker :: forall m. Array Prop -> Markup -> Markup
-marker = element Nothing "marker"
+linearGradient :: Array Prop -> Markup -> Markup
+linearGradient = element svgNamespace "linearGradient"
 
-mask :: forall m. Array Prop -> Markup -> Markup
-mask = element Nothing "mask"
+marker :: Array Prop -> Markup -> Markup
+marker = element svgNamespace "marker"
 
-metadata :: forall m. Array Prop -> Markup -> Markup
-metadata = element Nothing "metadata"
+mask :: Array Prop -> Markup -> Markup
+mask = element svgNamespace "mask"
 
-missingGlyph :: forall m. Array Prop -> Markup -> Markup
-missingGlyph = element Nothing "missing-glyph"
+metadata :: Array Prop -> Markup -> Markup
+metadata = element svgNamespace "metadata"
 
-mpath :: forall m. Array Prop -> Markup -> Markup
-mpath = element Nothing "mpath"
+missingGlyph :: Array Prop -> Markup -> Markup
+missingGlyph = element svgNamespace "missing-glyph"
 
-path :: forall m. Array Prop -> Markup -> Markup
-path = element Nothing "path"
+mpath :: Array Prop -> Markup -> Markup
+mpath = element svgNamespace "mpath"
 
-pattern :: forall m. Array Prop -> Markup -> Markup
-pattern = element Nothing "pattern"
+path :: Array Prop -> Markup -> Markup
+path = element svgNamespace "path"
 
-polygon :: forall m. Array Prop -> Markup -> Markup
-polygon = element Nothing "polygon"
+pattern :: Array Prop -> Markup -> Markup
+pattern = element svgNamespace "pattern"
 
-polyline :: forall m. Array Prop -> Markup -> Markup
-polyline = element Nothing "polyline"
+polygon :: Array Prop -> Markup -> Markup
+polygon = element svgNamespace "polygon"
 
-radialGradient :: forall m. Array Prop -> Markup -> Markup
-radialGradient = element Nothing "radialGradient"
+polyline :: Array Prop -> Markup -> Markup
+polyline = element svgNamespace "polyline"
 
-rect :: forall m. Array Prop -> Markup -> Markup
-rect = element Nothing "rect"
+radialGradient :: Array Prop -> Markup -> Markup
+radialGradient = element svgNamespace "radialGradient"
 
-script :: forall m. Array Prop -> Markup -> Markup
-script = element Nothing "script"
+rect :: Array Prop -> Markup -> Markup
+rect = element svgNamespace "rect"
 
-set :: forall m. Array Prop -> Markup -> Markup
-set = element Nothing "set"
+script :: Array Prop -> Markup -> Markup
+script = element svgNamespace "script"
 
-stop :: forall m. Array Prop -> Markup -> Markup
-stop = element Nothing "stop"
+set :: Array Prop -> Markup -> Markup
+set = element svgNamespace "set"
 
-style :: forall m. Array Prop -> Markup -> Markup
-style = element Nothing "style"
+stop :: Array Prop -> Markup -> Markup
+stop = element svgNamespace "stop"
 
-svg :: forall m. Array Prop -> Markup -> Markup
-svg = element Nothing "svg"
+style :: Array Prop -> Markup -> Markup
+style = element svgNamespace "style"
 
-switch :: forall m. Array Prop -> Markup -> Markup
-switch = element Nothing "switch"
+svg :: Array Prop -> Markup -> Markup
+svg = element svgNamespace "svg"
 
-symbol :: forall m. Array Prop -> Markup -> Markup
-symbol = element Nothing "symbol"
+switch :: Array Prop -> Markup -> Markup
+switch = element svgNamespace "switch"
 
-text :: forall m. Array Prop -> Markup -> Markup
-text = element Nothing "text"
+symbol :: Array Prop -> Markup -> Markup
+symbol = element svgNamespace "symbol"
 
-textPath :: forall m. Array Prop -> Markup -> Markup
-textPath = element Nothing "textPath"
+text :: Array Prop -> Markup -> Markup
+text = element svgNamespace "text"
 
-title :: forall m. Array Prop -> Markup -> Markup
-title = element Nothing "title"
+textPath :: Array Prop -> Markup -> Markup
+textPath = element svgNamespace "textPath"
 
-tref :: forall m. Array Prop -> Markup -> Markup
-tref = element Nothing "tref"
+title :: Array Prop -> Markup -> Markup
+title = element svgNamespace "title"
 
-tspan :: forall m. Array Prop -> Markup -> Markup
-tspan = element Nothing "tspan"
+tref :: Array Prop -> Markup -> Markup
+tref = element svgNamespace "tref"
 
-use :: forall m. Array Prop -> Markup -> Markup
-use = element Nothing "use"
+tspan :: Array Prop -> Markup -> Markup
+tspan = element svgNamespace "tspan"
 
-view :: forall m. Array Prop -> Markup -> Markup
-view = element Nothing "view"
+use :: Array Prop -> Markup -> Markup
+use = element svgNamespace "use"
 
-vkern :: forall m. Array Prop -> Markup -> Markup
-vkern = element Nothing "vkern"
+view :: Array Prop -> Markup -> Markup
+view = element svgNamespace "view"
+
+vkern :: Array Prop -> Markup -> Markup
+vkern = element svgNamespace "vkern"
 
 --------------------------------------------------------------------------------
 -- Attributes
@@ -268,3 +270,15 @@ yA = attr "y"
 
 dyA :: String -> Prop
 dyA = attr "dy"
+
+dA :: String -> Prop
+dA = attr "d"
+
+fillA :: String -> Prop
+fillA = attr "fill"
+
+strokeA :: String -> Prop
+strokeA = attr "stroke"
+
+strokeWidthA :: String -> Prop
+strokeWidthA = attr "stroke-width"
