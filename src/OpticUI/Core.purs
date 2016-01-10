@@ -12,11 +12,10 @@ module OpticUI.Core
   ) where
 --------------------------------------------------------------------------------
 import           Prelude
-import           Data.Profunctor            (Profunctor, dimap)
-import           Data.Profunctor.Choice     (Choice, left, right)
-import           Data.Profunctor.Strong     (Strong, first, second)
+import           Data.Profunctor            (Profunctor)
+import           Data.Profunctor.Choice     (Choice)
+import           Data.Profunctor.Strong     (Strong)
 import           Control.Monad.State
-import           Control.Monad.State.Class
 import           Control.Monad.Eff          (Eff ())
 import           Data.Monoid                (Monoid, mempty)
 import           Data.Lens
