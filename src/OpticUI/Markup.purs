@@ -1,16 +1,11 @@
 module OpticUI.Markup where
 --------------------------------------------------------------------------------
 import Prelude
-import Data.Maybe  (Maybe (..))
-import Data.Exists (Exists (), mkExists, runExists)
-import qualified OpticUI.Internal.VirtualDOM as VD
+import Data.Maybe  (Maybe ())
+import Data.Exists (Exists (), mkExists)
 import Control.Monad.Eff (Eff())
-import Data.Monoid (Monoid, mempty)
-import Data.Foldable (foldMap)
-import Data.Nullable     (Nullable(), toNullable)
-import Data.Function     (Fn2 (), runFn2)
+import Data.Monoid (Monoid)
 import DOM.HTML.Types (HTMLElement ())
-import Control.Monad.Writer.Trans (WriterT (..), execWriterT)
 import Unsafe.Coerce   (unsafeCoerce)
 --------------------------------------------------------------------------------
 
@@ -27,10 +22,10 @@ data Node
   = Text String
   | Element (Maybe NS) TagName (Array Prop) Markup
 
-element :: forall eff. Maybe NS -> TagName -> Array Prop -> Markup -> Markup
+element :: Maybe NS -> TagName -> Array Prop -> Markup -> Markup
 element ns tag props childs = Markup [ Element ns tag props childs ]
 
-text :: forall eff. String -> Markup
+text :: String -> Markup
 text t = Markup [ Text t ]
 
 instance markupSemigroup :: Semigroup Markup where
@@ -51,10 +46,10 @@ data Prop
 
 data PropE e = PropE e
 
-attr :: forall eff. AttrName -> String -> Prop
+attr :: AttrName -> String -> Prop
 attr n v = AttrP n v
 
-prop :: forall eff a. PropName -> a -> Prop
+prop :: forall a. PropName -> a -> Prop
 prop n v = PropP n (mkExists (PropE v))
 
 handle :: forall e eff. EventName -> (e -> Eff eff Unit) -> Prop
@@ -88,6 +83,7 @@ mkInitializer = unsafeCoerce
 runInitializer :: forall r. ((forall eff. HTMLElement -> Eff eff Unit) -> r) -> Initializer -> r
 runInitializer f init = f (unsafeCoerce init)
 
+initializer :: forall eff . String -> (HTMLElement -> Eff eff Unit) -> Prop
 initializer s f = InitializerP s (mkInitializer f)
 
 mkFinalizer   :: forall eff. (HTMLElement -> Eff eff Unit) -> Finalizer
@@ -96,6 +92,7 @@ mkFinalizer   = unsafeCoerce
 runFinalizer :: forall r. ((forall eff. HTMLElement -> Eff eff Unit) -> r) -> Finalizer -> r
 runFinalizer f i = f (unsafeCoerce i)
 
+finalizer :: forall eff. String -> (HTMLElement -> Eff eff Unit) -> Prop
 finalizer s f = FinalizerP s (mkFinalizer f)
 
 --------------------------------------------------------------------------------
