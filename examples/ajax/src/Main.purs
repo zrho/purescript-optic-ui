@@ -18,11 +18,11 @@ import qualified Network.HTTP.Affjax        as AJ
 
 main = animate { name: "", repos: Nothing } $ with \s h -> let
   url = "https://api.github.com/users/" ++ s.name ++ "/repos"
-  submitted _ = do
+  submitted _ = update h do
     r <- async $ JS.decode <<< _.response <$> AJ.get url
-    runHandler h (s # repos ?~ Left r)
-  loaded a  = runHandler h $ s # repos ?~ Right a
-  failure _ = runHandler h $ s # repos ?~ Right Nothing
+    pure $ s # repos ?~ Left r
+  loaded a  = updatePure h $ s # repos ?~ Right a
+  failure _ = updatePure h $ s # repos ?~ Right Nothing
   in mconcat
     [ ui $ H.h1_ $ text "GitHub Repository List"
     , ui $ H.p_ $ text "Enter the name of a GitHub user:"
@@ -38,6 +38,7 @@ main = animate { name: "", repos: Nothing } $ with \s h -> let
       ]
     ]
 
+repoList :: forall eff m. (Functor m) => UI_ eff m Markup JS.JValue
 repoList = with \s h -> mconcat
   [ ui $ H.h2_ $ text "Repositories"
   , withView H.ul_ $ traversal

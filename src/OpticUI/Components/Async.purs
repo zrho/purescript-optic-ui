@@ -13,11 +13,11 @@ import Data.Monoid
 data Async eff a = Async (Ref (Either Error a -> Eff eff Unit))
 
 onResult
-  :: forall eff v t a. (Monoid v)
+  :: forall eff m v t a. (Monoid v, Functor m)
   => (a -> Eff (ref :: REF | eff) Unit)
   -> (Error -> Eff (ref :: REF | eff) Unit)
-  -> UI (ref :: REF | eff) v (Async (ref :: REF | eff) a) t
-onResult s f = with \(Async r) _ -> inline do
+  -> UI (ref :: REF | eff) m v (Async (ref :: REF | eff) a) t
+onResult s f = with \(Async r) _ -> unsafeInline do
   writeRef r (either f s)
   pure mempty
 

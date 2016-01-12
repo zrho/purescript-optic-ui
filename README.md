@@ -16,7 +16,7 @@ Examples
 
 ```purescript
 main = animate false $ with \on h ->
-  let clicked _ = runHandler h (not on)
+  let clicked _ = updatePure h (not on)
   in mconcat $ ui <$>
     [ H.h1_ $ text "Toggle Button"
     , H.button [H.titleA "Toggle", H.onClick clicked] $ text $ if on then "On" else "Off"

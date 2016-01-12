@@ -3,52 +3,64 @@
 #### `UI`
 
 ``` purescript
-newtype UI eff v s t
+newtype UI eff m v s t
 ```
 
 ##### Instances
 ``` purescript
-instance uiProfunctor :: Profunctor (UI eff v)
-instance uiChoice :: (Monoid v) => Choice (UI eff v)
-instance uiStrong :: Strong (UI eff v)
-instance uiSemigroup :: (Semigroup v) => Semigroup (UI eff v s t)
-instance uiMonoid :: (Monoid v) => Monoid (UI eff v s t)
+(Functor m) => Profunctor (UI eff m v)
+(Monoid v, Functor m) => Choice (UI eff m v)
+(Functor m) => Strong (UI eff m v)
+(Semigroup v) => Semigroup (UI eff m v s t)
+(Monoid v) => Monoid (UI eff m v s t)
+```
+
+#### `UI_`
+
+``` purescript
+type UI_ eff m v s = UI eff m v s s
 ```
 
 #### `runUI`
 
 ``` purescript
-runUI :: forall eff v s t. UI eff v s t -> s -> Handler eff t -> Eff eff v
+runUI :: forall eff v s t. UI eff (Eff eff) v s t -> s -> Handler eff (Eff eff) t -> Eff eff v
 ```
 
 #### `Handler`
 
 ``` purescript
-newtype Handler eff s
-  = Handler (s -> Eff eff Unit)
+newtype Handler eff m s
+  = Handler (m s -> Eff eff Unit)
 ```
 
 ##### Instances
 ``` purescript
-instance handlerContravariant :: Contravariant (Handler eff)
+(Functor m) => Contravariant (Handler eff m)
 ```
 
-#### `runHandler`
+#### `update`
 
 ``` purescript
-runHandler :: forall eff s. Handler eff s -> s -> Eff eff Unit
+update :: forall eff m s. Handler eff m s -> m s -> Eff eff Unit
+```
+
+#### `updatePure`
+
+``` purescript
+updatePure :: forall eff m s. (Applicative m) => Handler eff m s -> s -> Eff eff Unit
 ```
 
 #### `ui`
 
 ``` purescript
-ui :: forall eff v s t. v -> UI eff v s t
+ui :: forall eff m v s t. v -> UI eff m v s t
 ```
 
 #### `with`
 
 ``` purescript
-with :: forall eff v s t. (s -> Handler eff t -> UI eff v s t) -> UI eff v s t
+with :: forall eff m v s t. (s -> Handler eff m t -> UI eff m v s t) -> UI eff m v s t
 ```
 
 Access the state and the handler for an `UI` component.
@@ -56,15 +68,23 @@ Access the state and the handler for an `UI` component.
 #### `withView`
 
 ``` purescript
-withView :: forall eff v w s t. (v -> w) -> UI eff v s t -> UI eff w s t
+withView :: forall eff m v w s t. (v -> w) -> UI eff m v s t -> UI eff m w s t
 ```
 
 Manipulate the view of an `UI` component.
 
+#### `withEffects`
+
+``` purescript
+withEffects :: forall eff m w v s t k. (m t -> w k) -> UI eff m v s t -> UI eff w v s k
+```
+
+Interpret the effects of an `UI` component in a different monad.
+
 #### `traversal`
 
 ``` purescript
-traversal :: forall eff v s t. (Monoid v) => Traversal s s t t -> UI eff v t t -> UI eff v s s
+traversal :: forall eff m v s t. (Monoid v, Functor m) => Traversal s s t t -> UI eff m v t t -> UI eff m v s s
 ```
 
 Display a `UI` component for each focus of a `Traversal`.
@@ -72,16 +92,16 @@ Display a `UI` component for each focus of a `Traversal`.
 #### `foreach`
 
 ``` purescript
-foreach :: forall eff v s t. (Monoid v, Traversable t) => (Int -> UI eff v s s) -> UI eff v (t s) (t s)
+foreach :: forall eff m v s t. (Monoid v, Traversable t, Functor m) => (Int -> UI eff m v s s) -> UI eff m v (t s) (t s)
 ```
 
 Display a `UI` component for each element of a `Traversable` container,
 with access to the index into the container.
 
-#### `inline`
+#### `unsafeInline`
 
 ``` purescript
-inline :: forall eff v s t a. Eff eff v -> UI eff v s t
+unsafeInline :: forall eff m v s t. Eff eff v -> UI eff m v s t
 ```
 
 Create a `UI` component that executes an action while build.

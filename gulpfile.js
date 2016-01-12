@@ -37,7 +37,9 @@ gulp.task("docs", ["clean-docs"], function() {
     {
       "OpticUI.Components": "docs/OpticUI/Components.md",
       "OpticUI.Components.Async": "docs/OpticUI/Components/Async.md",
+      "OpticUI.Components.State": "docs/OpticUI/Components/State.md",
       "OpticUI.Core": "docs/OpticUI/Core.md",
+      "OpticUI.Markup": "docs/OpticUI/Markup.md",
       "OpticUI.Markup.HTML": "docs/OpticUI/Markup/HTML.md",
       "OpticUI.Markup.SVG": "docs/OpticUI/Markup/SVG.md"
     }

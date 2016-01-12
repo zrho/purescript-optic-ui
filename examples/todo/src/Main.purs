@@ -16,8 +16,8 @@ task del = withView H.li_ $ mconcat
   ]
 
 todoList = with $ \s h -> let
-  deleted i = runHandler h $ s # tasks %~ maybe [] id <<< AR.deleteAt i
-  added     = runHandler h $ s
+  deleted i = updatePure h $ s # tasks %~ maybe [] id <<< AR.deleteAt i
+  added     = updatePure h $ s
     # tasks %~ AR.cons { name: s.name, completed: false }
     # name  .~ ""
   num = AR.length s.tasks

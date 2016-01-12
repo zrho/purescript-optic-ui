@@ -780,6 +780,30 @@ typeA :: String -> Prop
 placeholderA :: String -> Prop
 ```
 
+#### `srcA`
+
+``` purescript
+srcA :: String -> Prop
+```
+
+#### `heightA`
+
+``` purescript
+heightA :: Int -> Prop
+```
+
+#### `widthA`
+
+``` purescript
+widthA :: Int -> Prop
+```
+
+#### `styleA`
+
+``` purescript
+styleA :: String -> Prop
+```
+
 #### `valueA`
 
 ``` purescript
@@ -792,10 +816,58 @@ valueA :: String -> Prop
 checkedA :: Boolean -> Prop
 ```
 
+#### `draggableA`
+
+``` purescript
+draggableA :: Prop
+```
+
 #### `onClick`
 
 ``` purescript
 onClick :: forall eff. (Event () -> Eff eff Unit) -> Prop
+```
+
+#### `onDblClick`
+
+``` purescript
+onDblClick :: forall eff. (Event MouseEvent -> Eff eff Unit) -> Prop
+```
+
+#### `onMouseDown`
+
+``` purescript
+onMouseDown :: forall eff. (Event MouseEvent -> Eff eff Unit) -> Prop
+```
+
+#### `onMouseUp`
+
+``` purescript
+onMouseUp :: forall eff. (Event MouseEvent -> Eff eff Unit) -> Prop
+```
+
+#### `onMouseMove`
+
+``` purescript
+onMouseMove :: forall eff. (Event MouseEvent -> Eff eff Unit) -> Prop
+```
+
+#### `onMouseLeave`
+
+``` purescript
+onMouseLeave :: forall eff. (Event MouseEvent -> Eff eff Unit) -> Prop
+```
+
+#### `onMouseOver`
+
+``` purescript
+onMouseOver :: forall eff. (Event MouseEvent -> Eff eff Unit) -> Prop
+```
+
+#### `onWheel`
+
+``` purescript
+onWheel :: forall eff. (Event WheelEvent -> Eff eff Unit) -> Prop
 ```
 
 #### `onInput`
@@ -804,16 +876,82 @@ onClick :: forall eff. (Event () -> Eff eff Unit) -> Prop
 onInput :: forall eff a. (IsForeign a) => (Event () -> Maybe a -> Eff eff Unit) -> Prop
 ```
 
+#### `onChange`
+
+``` purescript
+onChange :: forall eff. (Event () -> Eff eff Unit) -> Prop
+```
+
+#### `onKeydown`
+
+``` purescript
+onKeydown :: forall eff a. (IsForeign a) => (KeyboardEvent () -> Maybe a -> Eff eff Unit) -> Prop
+```
+
 #### `onChecked`
 
 ``` purescript
-onChecked :: forall eff a. (Event () -> Boolean -> Eff eff Unit) -> Prop
+onChecked :: forall eff. (Event () -> Boolean -> Eff eff Unit) -> Prop
+```
+
+#### `onDragStart`
+
+``` purescript
+onDragStart :: forall eff. (Event DragEvent -> Eff eff Unit) -> Prop
+```
+
+#### `onDragOver`
+
+``` purescript
+onDragOver :: forall eff. (Event DragEvent -> Eff eff Unit) -> Prop
+```
+
+#### `onDrop`
+
+``` purescript
+onDrop :: forall eff. (Event DragEvent -> Eff eff Unit) -> Prop
+```
+
+#### `onInitialized`
+
+``` purescript
+onInitialized :: forall eff. UniqueStr -> (HTMLElement -> Eff eff Unit) -> Prop
+```
+
+#### `onFinalized`
+
+``` purescript
+onFinalized :: forall eff. UniqueStr -> (HTMLElement -> Eff eff Unit) -> Prop
 ```
 
 #### `getProp`
 
 ``` purescript
 getProp :: forall a r. (IsForeign a) => String -> Event r -> Maybe a
+```
+
+#### `WheelEvent`
+
+``` purescript
+type WheelEvent = (deltaX :: Number, deltaY :: Number, deltaZ :: Number, deltaMode :: Int)
+```
+
+#### `MouseEvent`
+
+``` purescript
+type MouseEvent = (button :: Number, detail :: Number, relatedTarget :: HTMLElement, clientX :: Number, clientY :: Number, screenX :: Number, screenY :: Number, pageX :: Number, pageY :: Number, ctrlKey :: Boolean, shiftKey :: Boolean, altKey :: Boolean, metaKey :: Boolean, which :: Number)
+```
+
+#### `DragEvent`
+
+``` purescript
+type DragEvent = (dataTransfer :: DataTransfer | MouseEvent)
+```
+
+#### `DataTransfer`
+
+``` purescript
+data DataTransfer :: *
 ```
 
 
