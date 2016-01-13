@@ -1,8 +1,9 @@
 module OpticUI.Markup where
 --------------------------------------------------------------------------------
 import Prelude
-import Data.Maybe  (Maybe ())
+import Data.Maybe  (Maybe (..))
 import Data.Exists (Exists (), mkExists)
+import Data.Lens
 import Control.Monad.Eff (Eff())
 import Data.Monoid (Monoid)
 import DOM.HTML.Types (HTMLElement ())
@@ -57,6 +58,11 @@ handle n f = HandlerP n (mkEventHandler f)
 
 key :: String -> Prop
 key = KeyP
+
+_KeyP :: PrismP Prop String
+_KeyP = prism' KeyP \p -> case p of
+  KeyP k -> Just k
+  _      -> Nothing
 
 --------------------------------------------------------------------------------
 
