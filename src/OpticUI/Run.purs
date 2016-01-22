@@ -1,4 +1,7 @@
-module OpticUI.Run where
+module OpticUI.Run
+  ( AnimateE ()
+  , animate
+  ) where
 --------------------------------------------------------------------------------
 import Prelude
 import OpticUI.Internal.VirtualDOM as VD
@@ -7,10 +10,8 @@ import OpticUI.Core
 import Control.Apply ((*>))
 import Control.Monad (when)
 import Control.Monad.Eff (Eff ())
-import Control.Monad.Eff.Ref (REF (), Ref (), newRef, readRef, writeRef)
 import Control.Monad.State.Trans (StateT (), runStateT)
-import Control.Monad.State.Class (get)
-import Control.Monad.Trans (lift)
+import Control.Monad.Fix
 import Data.Function (runFn2)
 import Data.Exists (runExists)
 import Data.Maybe (Maybe (..), maybe)
@@ -22,7 +23,6 @@ import Data.Foldable (fold)
 import Data.StrMap (StrMap (), empty)
 import Data.Lens
 import Data.Lens.At
-import Data.Lens.Zoom
 import DOM (DOM ())
 import DOM.Event.EventTarget (eventListener, addEventListener)
 import DOM.Event.EventTypes (load)
@@ -33,40 +33,30 @@ import DOM.HTML.Window (document)
 import DOM.Node.Node (appendChild)
 --------------------------------------------------------------------------------
 
-type Driver eff s = (s -> Eff eff s) -> Eff eff Unit
-type AnimateE eff = (dom :: DOM, ref :: REF | eff)
+type AnimateE eff = (dom :: DOM | eff)
 
 animate
   :: forall s eff. s
   -> UI (AnimateE eff) (Eff (AnimateE eff)) Markup s s
-  -> Eff (AnimateE eff) (Driver (AnimateE eff) s)
-animate s0 ui = do
-  let vnode0 = VD.vtext ""
-  let node0 = VD.createElement vnode0
-  stR <- newRef (
+  -> Eff (AnimateE eff) Unit
+animate s0 ui = let
+  vnode0 = VD.vtext ""
+  node0 = VD.createElement vnode0
+  rs0 =
     { memo: { initializers: empty, finalizers: empty }
     , uiState: s0, generation: 0, node: node0, vnode: vnode0
-    } :: RunState s)
-  let
-    step s = do
-      rs <- get
-      markup <- lift $ runUI ui s $ Handler (>>= (refresh rs.generation))
-      vnodeNew <- zoom memo (buildVTree markup)
-      nodeNew <- lift $ VD.patch (VD.diff rs.vnode vnodeNew) rs.node
-      vnode .= vnodeNew
-      uiState .= s
-      node .= nodeNew
-    checkGen gen go = do
-      cur <- use generation
-      when (gen == cur) (generation += 1 *> go)
-    refresh gen s = stateRef stR $ checkGen gen $ step s
-    driver f = stateRef stR do
-      generation += 1
-      use uiState >>= f >>> lift >>= step
-  onLoad do
+    } :: RunState s
+  step rs = void $ mfix \next -> do
+    markup <- runUI ui rs.uiState $ Handler (>>= (\t -> next unit t))
+    Tuple vnode memo <- runStateT (buildVTree markup) rs.memo
+    node <- VD.patch (VD.diff rs.vnode vnode) rs.node
+    pure \t -> refresh (rs.generation + 1) rs
+      { uiState = t , vnode = vnode, memo = memo
+      , node = node, generation = rs.generation + 1 }
+  refresh gen rs = when (gen == rs.generation) (step rs)
+  in onLoad do
     appendToBody node0
-    refresh 0 s0
-  return driver
+    refresh 0 rs0
 
 --------------------------------------------------------------------------------
 
@@ -115,37 +105,11 @@ type RunState s =
   , vnode      :: VD.VTree
   }
 
--- We really do need automatic generation of lenses. Or first class labels;
--- that would be even more awesome!
-
 initializers :: forall r. LensP { initializers :: StrMap VD.Props | r } (StrMap VD.Props)
 initializers = lens _.initializers _ { initializers = _ }
 
 finalizers :: forall r. LensP { finalizers :: StrMap VD.Props | r } (StrMap VD.Props)
 finalizers = lens _.finalizers _ { finalizers = _ }
-
-memo :: forall r. LensP { memo :: Memo | r } Memo
-memo = lens _.memo _ { memo = _ }
-
-uiState :: forall r s. LensP { uiState :: s | r } s
-uiState = lens _.uiState _ { uiState = _ }
-
-generation :: forall r. LensP { generation :: Int | r } Int
-generation = lens _.generation _ { generation = _ }
-
-node :: forall r. LensP { node :: HTMLElement | r } HTMLElement
-node = lens _.node _ { node = _ }
-
-vnode :: forall r. LensP { vnode :: VD.VTree | r } VD.VTree
-vnode = lens _.vnode _ { vnode = _ }
-
---------------------------------------------------------------------------------
-
--- | Executes an action in a state transformer on the value of a reference.
-stateRef
-  :: forall eff s a. Ref s
-  -> StateT s (Eff (ref :: REF | eff)) a -> Eff (ref :: REF | eff) a
-stateRef r go = readRef r >>= runStateT go >>= \(Tuple a t) -> writeRef r t *> pure a
 
 --------------------------------------------------------------------------------
 
