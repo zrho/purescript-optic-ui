@@ -6,7 +6,7 @@
   ],
   "description": "PureScript UI framework based on lenses",
   "license": "BSD-3-Clause",
-  "homepage": "zrho.de/projects/opticui",
+  "homepage": "github.com/zrho/purescript-optic-ui",
   "ignore": [
     "**/.*",
     "bower_components",

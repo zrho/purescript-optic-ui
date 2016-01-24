@@ -1,6 +1,9 @@
 Optic UI
 ================
 
+[![Build Status](https://travis-ci.org/zrho/purescript-optic-ui.svg?branch=master)](https://travis-ci.org/zrho/purescript-optic-ui)
+[![Maintainer: zrho](https://img.shields.io/badge/maintainer-zrho-lightgrey.svg)](http://github.com/zrho)
+
 Optic UI is a Purescript library that allows to write single page web user
 interfaces declaratively and concisely with the help of lenses and traversals:
 
@@ -10,6 +13,7 @@ of the state of their parent can be embedded in a bigger component using lenses
 and traversals that focus on the respective sub-states. Components provide a
 handler function that - given a new state - triggers an update of the UI and
 generate a view that is finally rendered using virtual-dom.
+
 
 Examples
 ---------------------
@@ -43,4 +47,8 @@ main = animate (Tuple "Left" "Right") $ withView H.div_ $ mconcat
   ]
 ```
 
-For more examples, have a look at the `examples` directory.
+For more examples, have a look at the `examples` directory:
+
+- [Todo Manager](examples/todo/src/Main.purs)
+- [AJAX Example](examples/ajax/src/Main.purs)
+- [Effects Example](example/effects/src/Main.purs)

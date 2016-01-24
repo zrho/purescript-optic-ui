@@ -1,32 +1,17 @@
 {
-  "name": "purescript-optic-ui",
-  "version": "0.1.0",
-  "description": "PureScript UI framework based on lenses",
-  "main": "gulpfile.js",
+  "private": true,
+  "scripts": {
+    "postinstall": "pulp dep install",
+    "build": "pulp build && npm run example-todo && npm run example-ajax && npm run example-effects && rimraf docs && pulp docs",
+    "example-todo": "bower link && cd examples/todo && bower link purescript-optic-ui && npm run build",
+    "example-ajax": "bower link && cd examples/ajax && bower link purescript-optic-ui && npm run build",
+    "example-effects": "bower link && cd examples/effects && bower link purescript-optic-ui && npm run build"
+  },
   "dependencies": {
     "virtual-dom": "latest"
   },
   "devDependencies": {
-    "bower": "latest",
-    "browserify": "latest",
-    "gulp": "latest",
-    "gulp-purescript": "latest",
-    "purescript": "latest",
-    "vinyl-source-stream": "latest",
-    "rimraf": "latest"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:zrho/purescript-optic-ui.git"
-  },
-  "scripts": {
-    "postinstall": "bower install",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "example-todo": "bower link && cd examples/todo && bower link purescript-optic-ui && gulp",
-    "example-ajax": "bower link && cd examples/ajax && bower link purescript-optic-ui && gulp",
-    "example-effects": "bower link && cd examples/effects && bower link purescript-optic-ui && gulp"
-  },
-  "author": "Lukas Heidemann",
-  "license": "BSD-3-Clause",
-  "homepage": "http://zrho.me/projects/opticui"
+    "pulp": "^4.0.1",
+    "rimraf": "^2.4.1"
+  }
 }

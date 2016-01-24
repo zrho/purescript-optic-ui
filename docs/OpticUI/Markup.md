@@ -112,6 +112,12 @@ handle :: forall e eff. EventName -> (e -> Eff eff Unit) -> Prop
 key :: String -> Prop
 ```
 
+#### `_KeyP`
+
+``` purescript
+_KeyP :: PrismP Prop String
+```
+
 #### `EventHandler`
 
 ``` purescript
