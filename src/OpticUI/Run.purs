@@ -10,8 +10,10 @@ import OpticUI.Core
 import Control.Apply ((*>))
 import Control.Monad (when)
 import Control.Monad.Eff (Eff ())
+import Control.Monad.Aff
 import Control.Monad.State.Trans (StateT (), runStateT)
-import Control.Monad.Fix
+import Control.Monad.Free.Trans
+import Control.Monad.Eff.Ref
 import Data.Function (runFn2)
 import Data.Exists (runExists)
 import Data.Maybe (Maybe (..), maybe)
@@ -33,30 +35,55 @@ import DOM.HTML.Window (document)
 import DOM.Node.Node (appendChild)
 --------------------------------------------------------------------------------
 
-type AnimateE eff = (dom :: DOM | eff)
+type AnimateE eff = (dom :: DOM, ref :: REF | eff)
+type Driver eff k = k -> Eff (AnimateE eff) Unit
 
 animate
-  :: forall s eff. s
-  -> UI (AnimateE eff) (Eff (AnimateE eff)) Markup s s
-  -> Eff (AnimateE eff) Unit
-animate s0 ui = let
-  vnode0 = VD.vtext ""
-  node0 = VD.createElement vnode0
-  rs0 =
-    { memo: { initializers: empty, finalizers: empty }
+  :: forall s eff k. s
+  -> UI (AnimateE eff) (Eff (AnimateE eff)) k Markup s s
+  -> Eff (AnimateE eff) (Driver eff k)
+animate s0 ui = do
+  let vnode0 = VD.vtext ""
+  let node0 = VD.createElement vnode0
+  stR <- newRef
+    ({ memo: { initializers: empty, finalizers: empty }
     , uiState: s0, generation: 0, node: node0, vnode: vnode0
-    } :: RunState s
-  step rs = void $ mfix \next -> do
-    markup <- runUI ui rs.uiState $ Handler (>>= (\t -> next unit t))
-    Tuple vnode memo <- runStateT (buildVTree markup) rs.memo
-    node <- VD.patch (VD.diff rs.vnode vnode) rs.node
-    pure \t -> refresh (rs.generation + 1) rs
-      { uiState = t , vnode = vnode, memo = memo
-      , node = node, generation = rs.generation + 1 }
-  refresh gen rs = when (gen == rs.generation) (step rs)
-  in onLoad do
+    , signalHandler: \_ -> pure false
+    } :: RunState (AnimateE eff) k s)
+  let
+    onEvent gen action = do
+      st <- readRef stR
+      when (gen == st.generation) $ action >>= \t -> step st { uiState = t }
+    onSignal k = do
+      st <- readRef stR
+      void $ st.signalHandler k
+    step st = case runUI ui st.uiState $ Handler (onEvent $ st.generation + 1) onSignal of
+      Result sh v -> do
+        Tuple vnode memo <- runStateT (buildVTree v) st.memo
+        node <- VD.patch (VD.diff st.vnode vnode) st.node
+        writeRef stR st
+          { vnode = vnode, memo = memo, signalHandler = sh
+          , node = node, generation = st.generation + 1 }
+  onLoad do
     appendToBody node0
-    refresh 0 rs0
+    readRef stR >>= step
+  pure onSignal
+
+--------------------------------------------------------------------------------
+
+type Memo =
+  { initializers :: StrMap VD.Props
+  , finalizers :: StrMap VD.Props
+  }
+
+type RunState eff k s =
+  { memo          :: Memo
+  , uiState       :: s
+  , generation    :: Int
+  , node          :: HTMLElement
+  , vnode         :: VD.VTree
+  , signalHandler :: k -> Eff eff Boolean
+  }
 
 --------------------------------------------------------------------------------
 
@@ -89,21 +116,6 @@ toVProp (KeyP key)           = pure mempty
 -- | correct StringMap in the state with the unique key
 findProp :: forall m s p. (Monad m) => LensP s (StrMap p) -> UniqueStr -> p -> StateT s m p
 findProp l key new = use (l <<< at key) >>= maybe ((l <<< at key ?= new) *> pure new) pure
-
---------------------------------------------------------------------------------
-
-type Memo =
-  { initializers :: StrMap VD.Props
-  , finalizers :: StrMap VD.Props
-  }
-
-type RunState s =
-  { memo       :: Memo
-  , uiState    :: s
-  , generation :: Int
-  , node       :: HTMLElement
-  , vnode      :: VD.VTree
-  }
 
 initializers :: forall r. LensP { initializers :: StrMap VD.Props | r } (StrMap VD.Props)
 initializers = lens _.initializers _ { initializers = _ }

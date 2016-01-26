@@ -1,49 +1,61 @@
 module Main where
 --------------------------------------------------------------------------------
-import           Prelude
-import           Data.Lens
-import           Data.Lens.Index            (ix)
-import           OpticUI
-import           OpticUI.Components
-import           OpticUI.Components.Async
-import qualified OpticUI.Markup.HTML        as H
-import qualified Data.Array                 as A
-import           Data.Either                (Either (..))
-import           Data.Maybe                 (Maybe (..))
-import           Data.Foldable              (mconcat)
-import           Data.Traversable           (traverse)
-import qualified Data.JSON                  as JS
-import qualified Network.HTTP.Affjax        as AJ
+import Prelude
+import Data.Lens
+import Data.Lens.Index            (ix)
+import OpticUI
+import OpticUI.Components
+import OpticUI.Util.Remote
+import OpticUI.Util.Async
+import OpticUI.Markup.HTML        as H
+import Data.Array                 as A
+import Data.Either                (Either (..))
+import Data.Maybe                 (Maybe (..), maybe)
+import Data.Foldable              (mconcat)
+import Data.Traversable           (traverse)
+import Data.JSON                  as JS
+import Network.HTTP.Affjax        as AJ
+import Control.Monad.Eff
 --------------------------------------------------------------------------------
 
-main = animate { name: "", repos: Nothing } $ with \s h -> let
-  url = "https://api.github.com/users/" ++ s.name ++ "/repos"
-  submitted _ = update h do
-    r <- async $ JS.decode <<< _.response <$> AJ.get url
-    pure $ s # repos ?~ Left r
-  loaded a  = updatePure h $ s # repos ?~ Right a
-  failure _ = updatePure h $ s # repos ?~ Right Nothing
+type App = { name :: String, repos :: Remote Unit JS.JValue }
+
+main = animate { name: "", repos: Init } repoApp
+
+-- | Application that allows a user to view the list of repositories of a
+-- | GitHub user. On submission, the application sends an AJAX request to
+-- | GitHub and receives the result as a signal.
+repoApp :: forall eff. UI_
+  (ajax :: AJ.AJAX | eff) (Eff (ajax :: AJ.AJAX | eff))
+  (Maybe JS.JValue) Markup App
+repoApp = withAsync $ with \s h -> let
+  submitted _ = update h $ do
+    let url = "https://api.github.com/users/" ++ s.name ++ "/repos"
+    async (JS.decode <<< _.response <$> AJ.get url) (const Nothing)
+    pure $ s # repos .~ Pending
+  loaded ma = updatePure h $ case ma of
+    Just a  -> s # repos .~ Success a
+    Nothing -> s # repos .~ Failed unit
   in mconcat
     [ ui $ H.h1_ $ text "GitHub Repository List"
     , ui $ H.p_ $ text "Enter the name of a GitHub user:"
     , name $ textField [ H.placeholderA "Enter a user name" ]
     , ui $ H.button [ H.onClick submitted ] $ text "Load"
-    , repos <<< _Just $ mconcat
-      [ _Left $ mconcat
-        [ ui $ H.p_ $ text "Fetching repositories..."
-        , onResult loaded failure
-        ]
-      , _Right <<< _Just $ repoList
-      , _Right <<< _Nothing $ ui $ H.p_ $ text "An error occured :("
+    , repos $ mconcat
+      [ _Failed $ ui $ H.p_ $ text "An error occured :("
+      , _Pending $ ui $ H.p_ $ text "Fetching repositories..."
+      , _Success repoList
       ]
+    , listen (const true) loaded
     ]
 
-repoList :: forall eff m. (Functor m) => UI_ eff m Markup JS.JValue
+-- | User interface component that displays the result of the GitHub API call.
+repoList :: forall eff m k. (Functor m) => UI_ eff m k Markup JS.JValue
 repoList = with \s h -> mconcat
   [ ui $ H.h2_ $ text "Repositories"
   , withView H.ul_ $ traversal
     (_JArray <<< traversed <<< _JObject <<< ix "name" <<< _JString)
-    $ with \s _ -> ui $ H.li_ $ text s
+    $ with \t _ -> ui $ H.li_ $ text t
   , _JArray <<< filtered A.null $ ui $ H.p_ $ text "There do not seem to be any repos."
   ]
 

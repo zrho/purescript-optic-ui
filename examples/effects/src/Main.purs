@@ -4,16 +4,20 @@ import Prelude
 import Control.Monad.State.Trans
 import Control.Monad.Free.Trans
 import Control.Monad.Rec.Class
+import Control.Monad.Eff
+import Control.Monad.Eff.Ref
+import Control.Monad.Aff
 import Control.Apply
 import Control.Bind
 import Data.Tuple
 import Data.Either
 import Data.Lens
+import Data.Identity
 import Data.Foldable
 import Data.Profunctor
 import OpticUI
 import OpticUI.Components
-import OpticUI.Components.State
+import OpticUI.Util.State
 import OpticUI.Markup.HTML as H
 --------------------------------------------------------------------------------
 
@@ -27,9 +31,8 @@ main = animate (Tuple "" "") $ withState $ withEffects storeState component
 -- |
 -- | - Set another part of the UI state.
 -- | - Run in a state monad.
--- | - Issue AJAX requests to a REST server.
 -- | - etc.
-component :: forall m eff. (Monad m) => UI_ eff (Store String m) Markup String
+component :: forall m k eff. (Monad m) => UI_ eff (Store String m) k Markup String
 component = with \s h -> mconcat
   [ ui $ H.p_ $ text "Press 'Put' or 'Get' to manipulate the hidden store."
   , textField []

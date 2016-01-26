@@ -13,14 +13,14 @@ import Control.Monad.Eff
 type Task = { name :: String, completed :: Boolean }
 type App  = { name :: String, tasks :: Array Task }
 
-task :: forall eff m. (Monad m) => Eff eff Unit -> UI_ eff m Markup Task
+task :: forall eff m k. (Monad m) => Eff eff Unit -> UI_ eff m k Markup Task
 task del = withView H.li_ $ mconcat
   [ completed $ checkBox [ H.titleA "Mark as completed" ]
   , name      $ textField [ H.placeholderA "Task description" ]
   , ui $ H.button [ H.titleA "Remove task", H.onClick (const del) ] (text "X")
   ]
 
-todoList :: forall eff m. (Monad m) => UI_ eff m Markup App
+todoList :: forall eff m k. (Monad m) => UI_ eff m k Markup App
 todoList = with $ \s h -> let
   deleted i = updatePure h $ s # tasks %~ maybe [] id <<< AR.deleteAt i
   added     = updatePure h $ s

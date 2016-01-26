@@ -21,10 +21,9 @@
     "purescript-exists": "latest",
     "purescript-refs": "latest",
     "purescript-aff": "latest",
-    "purescript-lazy": "latest",
     "purescript-profunctor": "latest",
     "purescript-profunctor-lenses": "latest",
     "purescript-maps": "~0.5.0",
-    "purescript-monad-fix": "latest"
+    "purescript-freet": "latest"
   }
 }

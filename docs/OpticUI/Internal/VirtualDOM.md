@@ -20,8 +20,8 @@ data Props
 
 ##### Instances
 ``` purescript
-Semigroup Props
-Monoid Props
+instance semigroupProps :: Semigroup Props
+instance monoidProps :: Monoid Props
 ```
 
 #### `createElement`
