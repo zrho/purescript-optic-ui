@@ -45,8 +45,8 @@ data Markup
 
 ##### Instances
 ``` purescript
-instance markupSemigroup :: Semigroup Markup
-instance markupMonoid :: Monoid Markup
+Semigroup Markup
+Monoid Markup
 ```
 
 #### `Node`

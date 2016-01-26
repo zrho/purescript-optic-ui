@@ -12,16 +12,16 @@ data Remote e a
 
 ##### Instances
 ``` purescript
-instance remoteFunctor :: Functor (Remote e)
-instance remoteApply :: Apply (Remote e)
-instance remoteApplicative :: Applicative (Remote e)
-instance remoteBind :: Bind (Remote e)
-instance remoteMonad :: Monad (Remote e)
-instance remoteBifunctor :: Bifunctor Remote
-instance remoteSemigroup :: (Semigroup a) => Semigroup (Remote e a)
-instance remoteMonoid :: (Monoid a) => Monoid (Remote e a)
-instance remoteFoldable :: Foldable (Remote e)
-instance remoteTraversable :: Traversable (Remote e)
+Functor (Remote e)
+Apply (Remote e)
+Applicative (Remote e)
+Bind (Remote e)
+Monad (Remote e)
+Bifunctor Remote
+(Semigroup a) => Semigroup (Remote e a)
+(Monoid a) => Monoid (Remote e a)
+Foldable (Remote e)
+Traversable (Remote e)
 ```
 
 #### `toRemote`

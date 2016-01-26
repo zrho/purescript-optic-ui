@@ -8,11 +8,11 @@ newtype UI eff m k v s t
 
 ##### Instances
 ``` purescript
-instance uiProfunctor :: (Functor m) => Profunctor (UI eff m k v)
-instance uiChoice :: (Monoid v, Functor m) => Choice (UI eff m k v)
-instance uiStrong :: (Functor m) => Strong (UI eff m k v)
-instance uiSemigroup :: (Semigroup v) => Semigroup (UI eff m k v s t)
-instance uiMonoid :: (Monoid v) => Monoid (UI eff m k v s t)
+(Functor m) => Profunctor (UI eff m k v)
+(Monoid v, Functor m) => Choice (UI eff m k v)
+(Functor m) => Strong (UI eff m k v)
+(Semigroup v) => Semigroup (UI eff m k v s t)
+(Monoid v) => Monoid (UI eff m k v s t)
 ```
 
 #### `UI_`
@@ -38,8 +38,8 @@ data Result eff k v
 
 ##### Instances
 ``` purescript
-instance resultSemigroup :: (Semigroup v) => Semigroup (Result eff k v)
-instance resultMonoid :: (Monoid v) => Monoid (Result eff k v)
+(Semigroup v) => Semigroup (Result eff k v)
+(Monoid v) => Monoid (Result eff k v)
 ```
 
 #### `Handler`
@@ -51,7 +51,7 @@ data Handler eff m k s
 
 ##### Instances
 ``` purescript
-instance handlerContravariant :: (Functor m) => Contravariant (Handler eff m k)
+(Functor m) => Contravariant (Handler eff m k)
 ```
 
 #### `update`

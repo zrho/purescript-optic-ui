@@ -3,7 +3,7 @@
 #### `AnimateE`
 
 ``` purescript
-type AnimateE eff = (dom :: DOM, ref :: REF, console :: CONSOLE | eff)
+type AnimateE eff = (dom :: DOM, ref :: REF | eff)
 ```
 
 #### `animate`

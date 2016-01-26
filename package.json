@@ -3,9 +3,9 @@
   "scripts": {
     "postinstall": "pulp dep install",
     "build": "pulp build && npm run example-todo && npm run example-ajax && npm run example-effects && rimraf docs && pulp docs",
-    "example-todo": "bower link && cd examples/todo && bower link purescript-optic-ui && npm run build",
-    "example-ajax": "bower link && cd examples/ajax && bower link purescript-optic-ui && npm run build",
-    "example-effects": "bower link && cd examples/effects && bower link purescript-optic-ui && npm run build"
+    "example-todo": "pulp dep link && cd examples/todo && pulp dep link purescript-optic-ui && npm run build",
+    "example-ajax": "pulp dep link && cd examples/ajax && pulp dep link purescript-optic-ui && npm run build",
+    "example-effects": "pulp dep link && cd examples/effects && pulp dep link purescript-optic-ui && npm run build"
   },
   "dependencies": {
     "virtual-dom": "latest"

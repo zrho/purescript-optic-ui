@@ -25,7 +25,7 @@ Async effect.
 
 ##### Instances
 ``` purescript
-instance actionFunctor :: Functor (AsyncF eff k)
+Functor (AsyncF eff k)
 ```
 
 #### `withAsync`
