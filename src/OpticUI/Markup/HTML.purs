@@ -396,6 +396,9 @@ wbr = element Nothing "wbr"
 textA :: String -> Prop
 textA = attr "text"
 
+hrefA :: String -> Prop
+hrefA = attr "href"
+
 titleA :: String -> Prop
 titleA = attr "title"
 
@@ -422,6 +425,9 @@ styleA = attr "style"
 
 valueA :: String -> Prop
 valueA = prop "value"
+
+readonlyA :: Boolean -> Prop
+readonlyA = prop "readOnly"
 
 checkedA :: Boolean -> Prop
 checkedA = prop "checked"
