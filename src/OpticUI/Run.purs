@@ -3,36 +3,38 @@ module OpticUI.Run
   , animate
   ) where
 --------------------------------------------------------------------------------
-import Prelude
-import OpticUI.Internal.VirtualDOM as VD
-import OpticUI.Markup
-import OpticUI.Core
-import Control.Apply ((*>))
-import Control.Monad (when)
-import Control.Monad.Eff (Eff ())
-import Control.Monad.Aff
+import Prelude                   (class Monad, Unit, void, ($), unit, pure,
+                                  (<$>), bind, (<<<), (>>=), return, (+), (==))
+import Control.Apply             ((*>))
+import Control.Monad             (when)
+import Control.Monad.Eff         (Eff ())
 import Control.Monad.State.Trans (StateT (), runStateT)
-import Control.Monad.Free.Trans
-import Control.Monad.Eff.Ref
-import Data.Function (runFn2)
-import Data.Exists (runExists)
-import Data.Maybe (Maybe (..), maybe)
-import Data.Nullable (toNullable, toMaybe)
-import Data.Monoid (Monoid, mempty)
-import Data.Tuple (Tuple (..))
-import Data.Traversable (traverse)
-import Data.Foldable (fold)
-import Data.StrMap (StrMap (), empty)
-import Data.Lens
-import Data.Lens.At
-import DOM (DOM ())
-import DOM.Event.EventTarget (eventListener, addEventListener)
-import DOM.Event.EventTypes (load)
-import DOM.HTML (window)
-import DOM.HTML.Document (body)
-import DOM.HTML.Types (HTMLElement (), htmlElementToNode, windowToEventTarget)
-import DOM.HTML.Window (document)
-import DOM.Node.Node (appendChild)
+import Control.Monad.Eff.Ref     (REF, readRef, writeRef, newRef)
+import Data.Function             (runFn2)
+import Data.Exists               (runExists)
+import Data.Maybe                (Maybe (..), maybe)
+import Data.Nullable             (toNullable, toMaybe)
+import Data.Monoid               (mempty)
+import Data.Tuple                (Tuple (..))
+import Data.Traversable          (traverse)
+import Data.Foldable             (fold)
+import Data.StrMap               (StrMap (), empty)
+import Data.Lens                 (LensP, lens, (?=), use, traversed, lastOf)
+import Data.Lens.At              (at)
+import DOM                       (DOM ())
+import DOM.Event.EventTarget     (eventListener, addEventListener)
+import DOM.Event.EventTypes      (load)
+import DOM.HTML                  (window)
+import DOM.HTML.Document         (body)
+import DOM.HTML.Types            (HTMLElement (), htmlElementToNode,
+                                  windowToEventTarget)
+import DOM.HTML.Window           (document)
+import DOM.Node.Node             (appendChild)
+import OpticUI.Markup            (UniqueStr, Markup(Markup), Node(..),
+                                  Prop(..), PropE(PropE), runFinalizer,
+                                  runInitializer, runEventHandler, _KeyP)
+import OpticUI.Core              (UI, Handler(Handler), Result(Result), runUI)
+import OpticUI.Internal.VirtualDOM as VD
 --------------------------------------------------------------------------------
 
 type AnimateE eff = (dom :: DOM, ref :: REF | eff)

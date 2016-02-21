@@ -17,22 +17,22 @@ module OpticUI.Core
   , foreach
   ) where
 --------------------------------------------------------------------------------
-import Prelude
-import Data.Profunctor            (Profunctor)
-import Data.Profunctor.Choice     (Choice)
-import Data.Profunctor.Strong     (Strong)
-import Control.Apply
-import Control.Monad.State
+import Prelude (class Applicative, class Functor, class Apply, class Semigroup,
+                Unit, (<<<), ($), (<>), (+), pure, map, (>>=), append, flip)
+import Control.Apply              ((*>))
+import Control.Monad.State        (state, evalState)
 import Control.Monad.Eff          (Eff ())
-import Data.Monoid                (Monoid, mempty)
-import Data.Lens
-import Data.Maybe (maybe)
-import Data.Map as M
-import Data.Profunctor.Star
-import Data.Traversable           (Traversable, traverse, sequence)
+import Data.Monoid                (class Monoid, mempty)
+import Data.Maybe                 (maybe)
+import Data.Traversable           (class Traversable, traverse, sequence)
 import Data.Tuple                 (Tuple (..))
 import Data.Either                (Either (..), either)
-import Data.Functor.Contravariant (Contravariant, cmap)
+import Data.Functor.Contravariant (class Contravariant, cmap)
+import Data.Profunctor            (class Profunctor)
+import Data.Profunctor.Choice     (class Choice)
+import Data.Profunctor.Strong     (class Strong)
+import Data.Profunctor.Star       (Star(Star), runStar)
+import Data.Lens                  (Traversal, APrismP, clonePrism, preview, review)
 --------------------------------------------------------------------------------
 
 -- | The type of user interface components in `OpticUI`.
