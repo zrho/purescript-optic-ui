@@ -1,63 +1,87 @@
 module Main where
 --------------------------------------------------------------------------------
 import Prelude
+import Data.Maybe
+import Data.List
 import Data.Lens
-import Data.Lens.Index            (ix)
+import Data.Lens.Index
 import OpticUI
-import OpticUI.Components
 import OpticUI.Util.Remote
-import OpticUI.Util.Async
-import OpticUI.Markup.HTML        as H
-import Data.Array                 as A
-import Data.Either                (Either (..))
-import Data.Maybe                 (Maybe (..), maybe)
-import Data.Foldable              (mconcat)
-import Data.Traversable           (traverse)
+import Web.Markup
+import Web.Markup.Event
+import Web.Markup.IncDOM
+import Web.Markup.HTML as H
+import Web.Markup.HTML.Attributes as A
+import Web.Markup.HTML.Event as E
+import Control.Monad.Eff
+import Control.Monad.Eff.Ref
+import Control.Monad.Eff.Exception
+import Control.Monad.Eff.Class (liftEff)
+import Control.Monad.Aff
+import DOM (DOM ())
 import Data.JSON                  as JS
 import Network.HTTP.Affjax        as AJ
-import Control.Monad.Eff
---------------------------------------------------------------------------------
+import Signal
+import Signal.Channel
 
-type App = { name :: String, repos :: Remote Unit JS.JValue }
+-- | State of the application.
+type App = { name :: String, repos :: Response }
 
-main = animate { name: "", repos: Init } repoApp
+-- | Effects of the application.
+type AppE = (ajax :: AJ.AJAX, ref :: REF, channel :: CHANNEL, dom :: DOM, err :: EXCEPTION)
 
--- | Application that allows a user to view the list of repositories of a
--- | GitHub user. On submission, the application sends an AJAX request to
--- | GitHub and receives the result as a signal.
-repoApp :: forall eff. UI_
-  (ajax :: AJ.AJAX | eff) (Eff (ajax :: AJ.AJAX | eff))
-  (Maybe JS.JValue) Markup App
-repoApp = withAsync $ with \s h -> let
-  submitted _ = update h $ do
-    let url = "https://api.github.com/users/" ++ s.name ++ "/repos"
-    async (JS.decode <<< _.response <$> AJ.get url) (const Nothing)
-    pure $ s # repos .~ Pending
-  loaded ma = updatePure h $ case ma of
-    Just a  -> s # repos .~ Success a
-    Nothing -> s # repos .~ Failed unit
-  in mconcat
-    [ ui $ H.h1_ $ text "GitHub Repository List"
-    , ui $ H.p_ $ text "Enter the name of a GitHub user:"
-    , name $ textField [ H.placeholderA "Enter a user name" ]
-    , ui $ H.button [ H.onClick submitted ] $ text "Load"
-    , repos $ mconcat
-      [ _Failed $ ui $ H.p_ $ text "An error occured :("
-      , _Pending $ ui $ H.p_ $ text "Fetching repositories..."
-      , _Success repoList
+-- | Type of the (parsed) response of the GitHub servers.
+type Response = Remote Error (List String)
+
+-- | Runs the `repoApp` component.
+main = do
+  response <- channel Init
+  backend <- listenerBackend \go -> runSignal (map go (subscribe response))
+  animate renderToBody backend { name: "", repos: Init } (repoApp response)
+
+-- | UI component that allows to query and view the repositories of a GitHub user.
+repoApp :: Channel Response -> UI (Eff AppE) Markup (Listener Response) App
+repoApp ch = withState \s ->
+  let
+    -- listener for form submission
+    submitted = do
+      let url     = "https://api.github.com/users/" ++ s.name ++ "/repos"
+      let fail    = send ch <<< Failed
+      let success = send ch <<< Success
+      runAff fail success do
+        r <- JS.decode <<< _.response <$> AJ.get url
+        liftEff $ maybe
+          (throwException $ error "Failed to decode response.")
+          (pure <<< toListOf repoNames) r
+      pure (s # repos .~ Pending)
+
+    -- listener for AJAX responses
+    listener = mkSub (listen (const true) \k -> pure $ s # repos .~ k)
+
+    -- traversal into the names of GitHub repositories
+    repoNames = _JArray <<< traversed <<< _JObject <<< ix "name" <<< _JString
+
+    -- UI for repo list
+    listUI = mconcat
+      [ _Failed  $ mkView $ H.p [] (text "An error occured :(")
+      , _Pending $ mkView $ H.p [] (text "Fetching repos...")
+      , _Success $ mconcat
+        [ mkView $ tag "h2" Nothing [] (text "Repositories")
+        , overView (H.ul []) $ traversed $ withState \s -> mkView $ H.li [] (text s)
+        ]
       ]
-    , listen (const true) loaded
-    ]
+  in
+    mconcat
+      [ listener
+      , mkView $ H.h1 [] (text "GitHub Repository List 2")
+      , mkView $ H.p  [] (text "Enter the name of a GitHub user:")
+      , name   $ textField [ A.placeholder "Enter a user name"]
+      , mkView $ H.button [ on_ E.Click submitted ] (text "Load")
+      , repos listUI
+      ]
 
--- | User interface component that displays the result of the GitHub API call.
-repoList :: forall eff m k. (Functor m) => UI_ eff m k Markup JS.JValue
-repoList = with \s h -> mconcat
-  [ ui $ H.h2_ $ text "Repositories"
-  , withView H.ul_ $ traversal
-    (_JArray <<< traversed <<< _JObject <<< ix "name" <<< _JString)
-    $ with \t _ -> ui $ H.li_ $ text t
-  , _JArray <<< filtered A.null $ ui $ H.p_ $ text "There do not seem to be any repos."
-  ]
+textField :: forall m k. (Plus k, Applicative m) => Array (Prop (m String)) -> UI m Markup k String
+textField ps = withState \s -> mkView $ H.input (ps ++ [A.value s, on E.Input pure]) mempty
 
 --------------------------------------------------------------------------------
 -- A huge list of lenses and prisms. Having to define this in user code is

@@ -2,7 +2,9 @@
   "name": "todo",
   "private": true,
   "dependencies": {
-    "purescript-optic-ui": "*"
+    "purescript-optic-ui": "*",
+    "purescript-markup-incdom": "~0.1.0",
+    "purescript-lazy": "~0.4.1"
   },
   "resolutions": {
     "purescript-transformers": "^0.6.1"

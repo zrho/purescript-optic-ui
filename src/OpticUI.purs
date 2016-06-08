@@ -1,10 +1,22 @@
 module OpticUI
   ( module OpticUI.Core
-  , module OpticUI.Markup
   , module OpticUI.Run
-  , module OpticUI.Components
+  , module OpticUI.Util.Lazy
+  , module OpticUI.Util.Empty
+  , module OpticUI.Util.Listener
+  , module Control.Alt
+  , module Control.Plus
+  , module Data.Monoid
+  , module Data.Foldable
+  , module Data.Lazy
   ) where
 import OpticUI.Core
-import OpticUI.Markup
 import OpticUI.Run
-import OpticUI.Components
+import OpticUI.Util.Lazy
+import OpticUI.Util.Empty
+import OpticUI.Util.Listener
+import Control.Alt (class Alt)
+import Control.Plus (class Plus)
+import Data.Monoid (mempty)
+import Data.Foldable (mconcat)
+import Data.Lazy (Lazy (), defer)

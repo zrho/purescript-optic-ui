@@ -9,7 +9,6 @@ import Data.Either
 import Data.Traversable
 import Data.Foldable
 import Data.Bifunctor
---------------------------------------------------------------------------------
 
 -- | A value retrieved from a remote service.
 data Remote e a = Success a | Failed e | Pending | Init
