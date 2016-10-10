@@ -51,4 +51,4 @@ For more examples, have a look at the `examples` directory:
 
 - [Todo Manager](examples/todo/src/Main.purs)
 - [AJAX Example](examples/ajax/src/Main.purs)
-- [Effects Example](example/effects/src/Main.purs)
+- [Effects Example](examples/effects/src/Main.purs)
