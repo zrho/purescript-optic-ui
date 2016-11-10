@@ -3,11 +3,11 @@ module OpticUI.Components
   , textField
   ) where
 --------------------------------------------------------------------------------
-import           Prelude
-import           OpticUI.Core
-import           OpticUI.Markup
-import qualified OpticUI.Markup.HTML as H
-import           Data.Maybe   (maybe)
+import Prelude             (class Applicative, (++), ($), id, (<<<))
+import Data.Maybe          (maybe)
+import OpticUI.Core        (UI, ui, updatePure, with)
+import OpticUI.Markup      (Markup, Prop)
+import OpticUI.Markup.HTML as H
 --------------------------------------------------------------------------------
 
 textField :: forall eff m k. (Applicative m) => Array Prop -> UI eff m k Markup String String

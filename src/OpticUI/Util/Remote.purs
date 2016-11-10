@@ -1,14 +1,17 @@
 module OpticUI.Util.Remote where
 --------------------------------------------------------------------------------
-import Prelude
-import Control.Apply
-import Data.Lens
-import Data.Monoid
-import Data.Maybe
-import Data.Either
-import Data.Traversable
-import Data.Foldable
-import Data.Bifunctor
+import Prelude          (class Semigroup, class Monad, class Bind,
+                         class Applicative, class Apply, class Functor,
+                         Unit, unit, const, pure, append, (>>=))
+import Control.Apply    (lift2)
+import Data.Lens        (PrismP, Prism, prism', prism, sequenceOf, traverseOf,
+                         foldMapOf, foldlOf, foldrOf, over)
+import Data.Monoid      (class Monoid, mempty)
+import Data.Maybe       (Maybe(Nothing, Just))
+import Data.Either      (Either(Left, Right), either)
+import Data.Traversable (class Traversable)
+import Data.Foldable    (class Foldable)
+import Data.Bifunctor   (class Bifunctor)
 --------------------------------------------------------------------------------
 
 -- | A value retrieved from a remote service.

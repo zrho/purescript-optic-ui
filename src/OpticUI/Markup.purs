@@ -1,13 +1,13 @@
 module OpticUI.Markup where
 --------------------------------------------------------------------------------
-import Prelude
-import Data.Maybe  (Maybe (..))
-import Data.Exists (Exists (), mkExists)
-import Data.Lens
+import Prelude           (class Semigroup, Unit, (++))
+import Data.Maybe        (Maybe (..))
+import Data.Exists       (Exists (), mkExists)
+import Data.Lens         (PrismP, prism')
 import Control.Monad.Eff (Eff())
-import Data.Monoid (Monoid)
-import DOM.HTML.Types (HTMLElement ())
-import Unsafe.Coerce   (unsafeCoerce)
+import Data.Monoid       (class Monoid)
+import DOM.HTML.Types    (HTMLElement ())
+import Unsafe.Coerce     (unsafeCoerce)
 --------------------------------------------------------------------------------
 
 type TagName   = String

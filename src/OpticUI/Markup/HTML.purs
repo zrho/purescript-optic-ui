@@ -1,15 +1,16 @@
 module OpticUI.Markup.HTML where
 --------------------------------------------------------------------------------
-import Prelude hiding (sub, div, map)
-import OpticUI.Markup (Markup (), Prop (), Event (), KeyboardEvent (), element, handle, attr, prop, UniqueStr (),
-                       initializer, finalizer)
+import Prelude            (Unit, (<<<), const, (++), id, ($), show)
 import Data.Maybe         (Maybe (..), maybe)
 import Data.Either        (either)
 import Data.Monoid        (mempty)
 import Data.Foreign       (toForeign)
-import Data.Foreign.Class (IsForeign, readProp)
+import Data.Foreign.Class (class IsForeign, readProp)
 import Control.Monad.Eff  (Eff())
 import DOM.HTML.Types     (HTMLElement ())
+import OpticUI.Markup (Markup (), Prop (), Event (), KeyboardEvent (),
+                       element, handle, attr, prop, UniqueStr (),
+                       initializer, finalizer)
 --------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------
@@ -396,6 +397,9 @@ wbr = element Nothing "wbr"
 textA :: String -> Prop
 textA = attr "text"
 
+hrefA :: String -> Prop
+hrefA = attr "href"
+
 titleA :: String -> Prop
 titleA = attr "title"
 
@@ -422,6 +426,9 @@ styleA = attr "style"
 
 valueA :: String -> Prop
 valueA = prop "value"
+
+readonlyA :: Boolean -> Prop
+readonlyA = prop "readOnly"
 
 checkedA :: Boolean -> Prop
 checkedA = prop "checked"
@@ -490,26 +497,26 @@ getProp prop = either (const Nothing) Just <<< readProp prop <<< toForeign <<< _
 -- Events
 
 type WheelEvent = (
-    deltaX :: Number, 
-    deltaY :: Number, 
+    deltaX :: Number,
+    deltaY :: Number,
     deltaZ :: Number,
     deltaMode :: Int
 )
 
 type MouseEvent = (
-    button :: Number, 
-    detail :: Number, 
-    relatedTarget :: HTMLElement, 
-    clientX :: Number, 
-    clientY :: Number, 
-    screenX :: Number, 
-    screenY :: Number, 
-    pageX :: Number, 
+    button :: Number,
+    detail :: Number,
+    relatedTarget :: HTMLElement,
+    clientX :: Number,
+    clientY :: Number,
+    screenX :: Number,
+    screenY :: Number,
+    pageX :: Number,
     pageY :: Number,
-    ctrlKey :: Boolean, 
-    shiftKey :: Boolean, 
-    altKey :: Boolean, 
-    metaKey :: Boolean, 
+    ctrlKey :: Boolean,
+    shiftKey :: Boolean,
+    altKey :: Boolean,
+    metaKey :: Boolean,
     which :: Number
 )
 

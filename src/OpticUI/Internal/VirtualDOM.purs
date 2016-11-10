@@ -1,7 +1,7 @@
 module OpticUI.Internal.VirtualDOM where
 --------------------------------------------------------------------------------
-import Prelude
-import Data.Monoid       (Monoid)
+import Prelude           (class Semigroup, Unit)
+import Data.Monoid       (class Monoid)
 import Control.Monad.Eff (Eff ())
 import Data.Function     (Fn2 (), runFn2)
 import DOM               (DOM ())
